@@ -11,24 +11,42 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
 $role = $_SESSION['user_role'];
 $username = $_SESSION['username'];
 
-// Fetch Toast Notification
-$toast_msg = isset($_SESSION['toast_msg']) ? $_SESSION['toast_msg'] : "";
-$toast_type = isset($_SESSION['toast_type']) ? $_SESSION['toast_type'] : "info";
-unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
+// Handle Delete User
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    $stmt = mysqli_prepare($koneksi, "DELETE FROM users WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    if (mysqli_stmt_execute($stmt)) {
+        $_SESSION['toast_msg'] = "Pengguna berhasil dihapus!";
+        $_SESSION['toast_type'] = "success";
+    }
+    mysqli_stmt_close($stmt);
+    header("Location: kelola_pengguna.php");
+    exit();
+}
+
+$toast_msg = "";
+$toast_type = "";
+if (isset($_SESSION['toast_msg'])) {
+    $toast_msg = $_SESSION['toast_msg'];
+    $toast_type = isset($_SESSION['toast_type']) ? $_SESSION['toast_type'] : 'info';
+    unset($_SESSION['toast_msg']);
+    unset($_SESSION['toast_type']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kelola Event - UniVent</title>
+  <title>Kelola Pengguna - UniVent</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <header>
     <div class="logo-container">
       <h1 class="logo-title">Uni<span>Vent</span></h1>
+      <span class="logo-subtitle">University Event</span>
     </div>
     <div class="header-right">
       <div class="user-profile-meta">
@@ -51,13 +69,13 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
               </a>
             </li>
             <li>
-              <a href="kelola_event.php" class="menu-link active">
+              <a href="kelola_event.php" class="menu-link">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 Kelola Event
               </a>
             </li>
             <li>
-              <a href="kelola_pengguna.php" class="menu-link">
+              <a href="kelola_pengguna.php" class="menu-link active">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 Kelola Pengguna
               </a>
@@ -89,58 +107,39 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
     </aside>
 
     <main>
+        <div class="view-header">
+          <h2 class="view-title">Edit Pengguna Ini</h2>
+        </div>
+        
         <?php
-        $stats = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total, SUM(status='Pending') as pending, SUM(status='Approved') as approved FROM events"));
-        ?>
-        <div class="stats-grid" style="display: flex; gap: 1rem; margin-bottom: 2rem; color: black;">
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Total: <?php echo (int)$stats['total']; ?></h3></div>
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Pending: <?php echo (int)$stats['pending']; ?></h3></div>
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Disetujui: <?php echo (int)$stats['approved']; ?></h3></div>
-        </div>
+        $id_pengguna = $_GET['id'];
+        $data_user = mysqli_query($koneksi, "SELECT * FROM users WHERE id = $id_pengguna");
+        $u = mysqli_fetch_assoc($data_user);
 
-        <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <h2 class="view-title">Kelola Event</h2>
-          <a href="tambah_event.php" class="btn-submit">+ Tambah Event</a>
-        </div>
+        if($u['role'] === 'admin' && 'panitia'){ ?>
 
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr><th>No</th><th>Nama Event</th><th>Kategori</th><th>Status</th><th>Aksi</th></tr>
-            </thead>
-            <tbody>
-              <?php
+          <form action="" method="post">
+            <h3>username</h3>
+            <input class="input-text" type="text">
+          </form>
 
-
-              $res = mysqli_query($koneksi, "SELECT * FROM events ORDER BY id DESC");
-              $no = 1;
-
-              while($row = mysqli_fetch_assoc($res)):
-              $kategori_id = $row['category_id'];
-              
-              $kategori = mysqli_query($koneksi, "SELECT * FROM categories WHERE id = $kategori_id");
-              $kategori = mysqli_fetch_assoc($kategori);
-              ?>
-              <tr>
-                <td><?php echo $no++; ?></td>
-                <td><?php echo htmlspecialchars($row['name']); ?></td>
-                <td><?php echo htmlspecialchars($kategori['nama']); ?></td>
-                <td><span class="status-badge <?php echo strtolower($row['status']); ?>"><?php echo $row['status']; ?></span></td>
-                <td>
-                  <a href="proses_hapus_event.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin hapus?');" class="btn-sm btn-reject">Hapus</a>
-                </td>
-              </tr>
-              <?php endwhile; ?>
-            </tbody>
-          </table>
-        </div>
+        <?php }else{ ?>
+        <?php } ?>
     </main>
+
   </div>
 
-  <div id="toast" class="toast <?php echo !empty($toast_msg) ? 'show' : ''; ?>">
-    <span><?php echo htmlspecialchars($toast_msg); ?></span>
+  <div id="toast" class="toast <?php echo !empty($toast_msg) ? 'show' : ''; ?> <?php echo ($toast_type === 'success') ? 'toast-success' : ''; ?>">
+    <span id="toast-message"><?php echo htmlspecialchars($toast_msg); ?></span>
   </div>
+
   <script>
+    const toast = document.getElementById('toast');
+    if (toast.classList.contains('show')) {
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
     function showFeatureAlert(featureName) {
       alert('Fitur "' + featureName + '" adalah mockup.');
     }

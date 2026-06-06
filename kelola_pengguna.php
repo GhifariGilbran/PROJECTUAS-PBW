@@ -110,7 +110,17 @@ if (isset($_SESSION['toast_msg'])) {
         <div class="view-header">
           <h2 class="view-title">Kelola Pengguna</h2>
         </div>
+        <form method="GET">
+        <?php $pilihanakun = $_GET['pilihanakun'] ?? ''; ?>
 
+        <select class="input-text" name="pilihanakun" id="pilihanakun" onchange="this.form.submit()">
+            <option value="" <?= $pilihanakun == '' ? 'selected' : '' ?>>Semua</option>
+            <option value="admin" <?= $pilihanakun == 'admin' ? 'selected' : '' ?>>Admin</option>
+            <option value="panitia" <?= $pilihanakun == 'panitia' ? 'selected' : '' ?>>Panitia</option>
+            <option value="peserta" <?= $pilihanakun == 'peserta' ? 'selected' : '' ?>>Peserta</option>
+        </select>
+        </form>
+        <br>
         <div class="table-container">
           <table>
             <thead>
@@ -124,10 +134,19 @@ if (isset($_SESSION['toast_msg'])) {
             </thead>
             <tbody>
               <?php
-              $users_res = mysqli_query($koneksi, "SELECT * FROM users ORDER BY id DESC");
-              $no = 1;
-              if(mysqli_num_rows($users_res) > 0) {
-                  while($u = mysqli_fetch_assoc($users_res)):
+              $pilihanakun = $_GET['pilihanakun'] ?? '';
+              ?>
+              
+
+              <?php
+                if ($pilihanakun == '') {
+                    $users_res = mysqli_query($koneksi, "SELECT * FROM users ORDER BY id DESC");
+                } else {
+                    $users_res = mysqli_query($koneksi, "SELECT * FROM users WHERE role = '$pilihanakun' ORDER BY id DESC");
+                }
+                $no = 1;
+                if(mysqli_num_rows($users_res) > 0) {
+                    while($u = mysqli_fetch_assoc($users_res)):
               ?>
               <tr>
                 <td><?php echo $no++; ?></td>
@@ -135,8 +154,13 @@ if (isset($_SESSION['toast_msg'])) {
                 <td><?php echo htmlspecialchars($u['nama_lengkap']); ?></td>
                 <td><span class="status-badge" style="color:var(--accent-blue)"><?php echo htmlspecialchars($u['role']); ?></span></td>
                 <td class="actions-cell">
-                  <a href="kelola_pengguna.php?action=delete&id=<?php echo $u['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');" class="btn-sm btn-reject" style="text-decoration:none;">Hapus</a>
-                </td>
+                  <?php if($u['role'] !== 'admin'){ ?>
+                    <a href="kelola_pengguna.php?action=delete&id=<?php echo $u['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');" class="btn-sm btn-reject" style="text-decoration:none;">Hapus</a>
+                  <?php } ?>
+
+                    <a href="edit_pengguna.php?action=&id=<?php echo $u['id']; ?>"  class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
+
+                  </td>
               </tr>
               <?php 
                   endwhile;

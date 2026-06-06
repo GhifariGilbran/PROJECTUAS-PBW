@@ -18,6 +18,9 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     exit();
 }
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 // BLOK 2: Pemrosesan Data Event Baru
 // Proses berjalan saat Admin mengirimkan form (POST request).
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -25,24 +28,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $panitia = $_POST['panitia'];
     $category = $_POST['category'];
-    $date = $_POST['date'];
+    $tglmulai = $_POST['tglmulai'];
+    $tglselesai = $_POST['tglselesai'];
+
     $location = $_POST['location'];
     // Kuota dikonversi menjadi integer (angka bulat) agar aman.
     $quota = (int)$_POST['quota'];
     $price = $_POST['price'];
     $desc = $_POST['desc'];
     $poster = $_POST['poster'];
+
+//     echo "<pre>";
+// var_dump($_POST);
+// echo "</pre>";
+// die();
     
     // Menetapkan status bawaan 'Approved' (Disetujui) karena event ini dibuat langsung oleh Admin.
-    $status = 'Approved'; 
 
     // BLOK 2A: Simpan ke Database
     // Menggunakan prepared statement untuk menghindari injeksi SQL dari karakter aneh yang mungkin terinput.
     // Query INSERT memasukkan 10 kolom data sekaligus.
-    $stmt = mysqli_prepare($koneksi, "INSERT INTO events (name, panitia, category, date, location, quota, price, `desc`, poster, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = mysqli_prepare($koneksi, "INSERT INTO events (name, panitia_id, category_id, tgl_mulai, tgl_selesai, lokasi, quota, harga, deskripsi, poster) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     
     // Binding parameter: "sssssissss" berarti (String, String, String, String, String, Integer, String, String, String, String)
-    mysqli_stmt_bind_param($stmt, "sssssissss", $name, $panitia, $category, $date, $location, $quota, $price, $desc, $poster, $status);
+    mysqli_stmt_bind_param($stmt, "siisssiiss", $name, $panitia, $category, $tglmulai, $tglselesai, $location, $quota, $price, $desc, $poster);
+    
     
     // Eksekusi penyimpanan dan pengecekan hasilnya
     if (mysqli_stmt_execute($stmt)) {

@@ -51,7 +51,7 @@ unset($_SESSION['login_error']);
             </div>
           </div>
 
-          <button type="submit" class="login-btn">Masuk ke Dashboard</button>
+          <button type="submit" class="login-btn">Masuk</button>
 
           <p class="register-link-text">Belum punya akun? <a href="register.php">Daftar sekarang</a></p>
 
@@ -60,6 +60,10 @@ unset($_SESSION['login_error']);
             <div class="demo-credentials-item">
               <span>Akses Admin</span><span>admin / admin123</span>
             </div>
+            <div class="demo-credentials-item">
+              <span>Akses panitia</span><span>panitia / panitia</span>
+            </div>
+           
             <div class="demo-credentials-item">
               <span>Akses Peserta</span><span>peserta / peserta123</span>
             </div>

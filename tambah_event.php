@@ -117,26 +117,57 @@ unset($_SESSION['tambah_event_error']);
               <label class="form-label" for="name">Nama Event</label>
               <input type="text" id="name" name="name" class="input-text" required placeholder="Contoh: Seminar Teknologi">
             </div>
-            <div class="form-group">
+
+            <?php 
+              $if = mysqli_query($koneksi, "SELECT id,prodi FROM users WHERE username = 'panitiaif'");
+              $if = mysqli_fetch_assoc($if);
+
+              $si = mysqli_query($koneksi, "SELECT id,prodi FROM users WHERE username = 'panitiasi'");
+              $si = mysqli_fetch_assoc($si);
+
+              if($role === 'admin'){
+            ?>
+              <div class="form-group">
               <label class="form-label" for="panitia">Penyelenggara (Panitia)</label>
-              <input type="text" id="panitia" name="panitia" class="input-text" required placeholder="Contoh: BEM Fakultas">
+              <select id="panitia" name="panitia" class="input-text" required>
+                <option value=""></option>
+                <option value="<?= $if['id'] ?>">Informatika</option>
+                <option value="<?= $si['id'] ?>">Sistem Informasi</option>
+              </select>
             </div>
+
+            <?php }else{ ?>
+              
+
+
+            <?php } ?>
+            
           </div>
 
           <div class="form-row-2">
             <div class="form-group">
               <label class="form-label" for="category">Kategori</label>
               <select id="category" name="category" class="input-text" required>
-                <option value="Seminar">Seminar</option>
-                <option value="Workshop">Workshop</option>
-                <option value="Lomba">Lomba</option>
-                <option value="Webinar">Webinar</option>
-                <option value="Lainnya">Lainnya</option>
+                
+                <?php
+                  $category = mysqli_query($koneksi, "SELECT * FROM categories");
+                  
+                  while($row = mysqli_fetch_assoc($category)) {
+                ?>
+
+                <option value="<?= $row['id']; ?>"><?= $row['nama'] ?></option>
+                    
+                <?php } ?>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="date">Tanggal & Waktu</label>
-              <input type="text" id="date" name="date" class="input-text" required placeholder="Contoh: 15 Oktober 2026, 09:00 WIB">
+              <label class="form-label" for="date">Tanggal Mulai</label>
+              <input type="date" id="tglmulai" name="tglmulai" class="input-text" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="date">Tanggal Selesai</label>
+              <input type="date" id="tglselesai" name="tglselesai" class="input-text" required>
             </div>
           </div>
 
@@ -146,8 +177,8 @@ unset($_SESSION['tambah_event_error']);
               <input type="text" id="location" name="location" class="input-text" required placeholder="Contoh: Aula Utama">
             </div>
             <div class="form-group">
-              <label class="form-label" for="poster">URL Poster (Gambar)</label>
-              <input type="text" id="poster" name="poster" class="input-text" required placeholder="Contoh: https://example.com/poster.jpg">
+              <label class="form-label" for="poster">Poster (Gambar)</label>
+              <input type="file" id="poster" name="poster" class="input-text" required>
             </div>
           </div>
 
@@ -164,7 +195,7 @@ unset($_SESSION['tambah_event_error']);
               </div>
               <div class="small-input-group">
                 <label class="form-label" for="price">Biaya Pendaftaran</label>
-                <input type="text" id="price" name="price" class="input-text" required placeholder="Contoh: Gratis atau Rp 50.000">
+                <input type="text" id="price" name="price" class="input-text" required placeholder="Isi 0 jika gratis">
               </div>
             </div>
             <button type="submit" class="btn-submit">Simpan Event</button>
