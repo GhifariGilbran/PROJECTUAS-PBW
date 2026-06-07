@@ -143,24 +143,39 @@ function updateDashboardStats() {
 }
 
 // Modal View Details
-window.viewEventDetails = function(name, panitia, quota, date, status, desc) {
-  modalTitle.textContent = name;
-  modalPanitia.textContent = panitia;
-  modalDate.textContent = date;
-  modalQuota.textContent = quota;
-  modalDesc.textContent = desc;
+window.viewEventDetails = function(name, panitia_id, quota, tgl_mulai, status, deskripsi) {
+  // Amankan data jika ada parameter yang bernilai undefined atau null
+  name = name || 'Nama Event Tidak Tersedia';
+  panitia_id = panitia_id || 'Tidak Ada Data Panitia';
+  quota = quota || '0';
+  tgl_mulai = tgl_mulai || 'Tanggal Belum Diatur';
+  status = status ? status.toLowerCase() : 'pending'; // Ubah ke huruf kecil untuk validasi
+  deskripsi = deskripsi || 'Tidak ada deskripsi untuk event ini.';
 
-  // Status mapping and styling
-  modalStatus.textContent = status;
-  modalStatus.className = ''; // Reset classes
-  if (status === 'Pending') {
+  // Tulis teks ke dalam DOM Element Modal
+  modalTitle.textContent = name;
+  modalPanitia.textContent = panitia_id;
+  modalQuota.textContent = quota;
+  modalDate.textContent = tgl_mulai;
+  modalDesc.textContent = deskripsi;
+
+  // Reset class style pada elemen badge status
+  modalStatus.className = ''; 
+
+  // Penkondisian status berdasarkan nilai dari database
+  if (status === 'pending') {
     modalStatus.classList.add('status-badge', 'pending');
-  } else if (status === 'Approved' || status === 'Selesai') {
+    modalStatus.textContent = 'PENDING';
+  } else if (status === 'approve' || status === 'approved' || status === 'selesai') {
     modalStatus.classList.add('status-badge', 'approved');
-    modalStatus.textContent = 'Disetujui';
+    modalStatus.textContent = 'DISETUJUI';
+  } else if (status === 'reject' || status === 'rejected') {
+    modalStatus.classList.add('status-badge', 'reject');
+    modalStatus.textContent = 'DITOLAK';
   } else {
-    modalStatus.classList.add('status-badge', 'rejected');
-    modalStatus.textContent = 'Ditolak';
+    // Cadangan jika status bernilai lain
+    modalStatus.classList.add('status-badge', 'pending');
+    modalStatus.textContent = status.toUpperCase();
   }
 
   detailsModal.showModal();
@@ -191,7 +206,7 @@ function renderAdminTable() {
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const pendingEvents = state.events.filter(e => e.status === 'Pending');
+  const pendingEvents = state.events.filter(e => e.status === 'pending');
 
   if (pendingEvents.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Tidak ada event yang menunggu persetujuan.</td></tr>`;
@@ -222,7 +237,7 @@ function renderPanitiaTable() {
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const panitiaEvents = state.events.filter(e => e.panitia === 'Himpunan Informatika');
+  const panitiaEvents = state.events.filter(e => e.panitia === 'Informatika');
 
   panitiaEvents.forEach(event => {
     const row = document.createElement('tr');
@@ -231,11 +246,11 @@ function renderPanitiaTable() {
     let statusClass = 'pending';
     let statusText = 'Pending';
 
-    if (event.status === 'Approved') {
-      statusClass = 'approved';
+    if (event.status === 'approve') {
+      statusClass = 'approve';
       statusText = 'Selesai';
-    } else if (event.status === 'Rejected') {
-      statusClass = 'rejected';
+    } else if (event.status === 'rejecte') {
+      statusClass = 'reject';
       statusText = 'Ditolak';
     }
 

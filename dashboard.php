@@ -17,7 +17,7 @@ if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
     $action = $_GET['action'];
     $id = (int)$_GET['id'];
     
-    $status = ($action === 'approve') ? 'Approved' : (($action === 'reject') ? 'Rejected' : null);
+    $status = ($action === 'approve') ? 'approve' : (($action === 'reject') ? 'reject' : null);    
     
     if ($status) {
         // Fetch event name first for toast message
@@ -35,8 +35,8 @@ if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
         $stmt = mysqli_prepare($koneksi, "UPDATE events SET status = ? WHERE id = ?");
         mysqli_stmt_bind_param($stmt, "si", $status, $id);
         if (mysqli_stmt_execute($stmt)) {
-            $_SESSION['toast_msg'] = "Event '" . $event_name . "' " . ($status === 'Approved' ? 'berhasil disetujui!' : 'telah ditolak.');
-            $_SESSION['toast_type'] = ($status === 'Approved') ? 'success' : 'info';
+            $_SESSION['toast_msg'] = "Event '" . $event_name . "' " . ($status === 'approve' ? 'berhasil disetujui!' : 'telah ditolak.');
+            $_SESSION['toast_type'] = ($status === 'approve') ? 'success' : 'info';
         }
         mysqli_stmt_close($stmt);
     }
@@ -214,12 +214,15 @@ if (isset($_SESSION['toast_msg'])) {
               <span class="stat-label">Distribusi Event</span>
               <ul class="distribution-list">
                 <?php
-                $dist_res = mysqli_query($koneksi, "SELECT category, COUNT(*) as count FROM events GROUP BY category");
+                $dist_res = mysqli_query($koneksi, "SELECT u.prodi, COUNT(e.id) AS jumlah_event
+                                                    FROM events e
+                                                    JOIN users u ON e.panitia_id = u.id
+                                                    GROUP BY u.prodi");
                 while ($dist_row = mysqli_fetch_assoc($dist_res)):
                 ?>
                 <li class="distribution-item">
-                  <span><?php echo htmlspecialchars($dist_row['category']); ?></span>
-                  <span class="count"><?php echo $dist_row['count']; ?></span>
+                  <span><?php echo htmlspecialchars($dist_row['prodi']); ?></span>
+                  <span class="count"><?php echo $dist_row['jumlah_event']; ?></span>
                 </li>
                 <?php endwhile; ?>
               </ul>
@@ -236,34 +239,49 @@ if (isset($_SESSION['toast_msg'])) {
                   <th>Nama Event</th>
                   <th>Kategori</th>
                   <th>Kuota</th>
-                  <th>Tanggal</th>
+                  <th>Tanggal Dibuat</th>
                   <th>Status</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 <?php 
-                $pending_events_res = mysqli_query($koneksi, "SELECT * FROM events WHERE status = 'Pending'");
+                // 1. QUERY YANG BENAR: Gabungkan events dan users untuk mencari prodi, khusus status pending
+                $query_pending = "SELECT events.*, users.prodi 
+                                  FROM events 
+                                  LEFT JOIN users ON events.panitia_id = users.id 
+                                  WHERE events.status = 'pending'";
+
+                $pending_events_res = mysqli_query($koneksi, $query_pending);
                 $has_pending = false;
+
+                // 2. MULAI PERULANGAN DATA
                 while ($event = mysqli_fetch_assoc($pending_events_res)):
                     $has_pending = true;
+                    
+                    // Format nama prodi agar rapi langsung di dalam loop PHP
+                    $prodi_tampil = !empty($event['prodi']) ? ucwords(str_replace('_', ' ', $event['prodi'])) : 'Umum / Tanpa Prodi';
+                    
+                    // Format tanggal cadangan jika kolom tgl_mulai kosong
+                    $tanggal_tampil = !empty($event['tgl_mulai']) ? $event['tgl_mulai'] : $event['created_at'];
                 ?>
                   <tr>
                     <td class="event-name-cell"><?php echo htmlspecialchars($event['name']); ?></td>
                     <td><?php echo htmlspecialchars($event['category']); ?></td>
                     <td><?php echo htmlspecialchars($event['quota']); ?></td>
-                    <td><?php echo htmlspecialchars($event['date']); ?></td>
+                    <td><?php echo htmlspecialchars($event['created_at']); ?></td>
                     <td><span class="status-badge pending">Pending</span></td>
                     <td class="actions-cell">
                       <a href="dashboard.php?action=reject&id=<?php echo $event['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
                       <a href="dashboard.php?action=approve&id=<?php echo $event['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
+                      
                       <button class="btn-detail" onclick="viewEventDetails(
-                          '<?php echo addslashes($event['name']); ?>', 
-                          '<?php echo addslashes($event['panitia']); ?>', 
-                          '<?php echo addslashes($event['quota']); ?>', 
-                          '<?php echo addslashes($event['date']); ?>', 
-                          'Pending', 
-                          '<?php echo addslashes($event['desc']); ?>'
+                          `<?php echo htmlspecialchars($event['name'], ENT_QUOTES, 'UTF-8'); ?>`, 
+                          `<?php echo $prodi_tampil; ?>`, 
+                          `<?php echo $event['quota']; ?>`, 
+                          `<?php echo $tanggal_tampil; ?>`, 
+                          `<?php echo $event['status']; ?>`, 
+                          `<?php echo htmlspecialchars($event['deskripsi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>`
                       )">Detail &rarr;</button>
                     </td>
                   </tr>
@@ -468,26 +486,40 @@ if (isset($_SESSION['toast_msg'])) {
     }
 
     // View Details Modal (called from table rows)
-    function viewEventDetails(name, panitia, quota, date, status, desc) {
-      modalTitle.textContent = name;
-      modalPanitia.textContent = panitia;
-      modalDate.textContent = date;
-      modalQuota.textContent = quota;
-      modalDesc.textContent = desc;
+    function viewEventDetails(name, panitia_id, quota, tgl_mulai, status, deskripsi) {
+    // Amankan data jika ada parameter yang bernilai undefined atau null
+    name = name || 'Nama Event Tidak Tersedia';
+    panitia_id = panitia_id || 'Tidak Ada Data Panitia';
+    quota = quota || '0';
+    tgl_mulai = tgl_mulai || 'Tanggal Belum Diatur';
+    status = status ? status.toLowerCase() : 'pending'; // Ubah ke huruf kecil untuk validasi
+    deskripsi = deskripsi || 'Tidak ada deskripsi untuk event ini.';
 
-      // Status Styling
-      modalStatus.textContent = status;
-      modalStatus.className = 'status-badge';
-      if (status === 'Pending') {
-        modalStatus.classList.add('pending');
-        modalStatus.textContent = 'Menunggu';
-      } else if (status === 'Approved') {
-        modalStatus.classList.add('approved');
-        modalStatus.textContent = 'Disetujui';
-      } else {
-        modalStatus.classList.add('rejected');
-        modalStatus.textContent = 'Ditolak';
-      }
+    // Tulis teks ke dalam DOM Element Modal
+    modalTitle.textContent = name;
+    modalPanitia.textContent = panitia_id;
+    modalQuota.textContent = quota;
+    modalDate.textContent = tgl_mulai;
+    modalDesc.textContent = deskripsi;
+    
+    // Reset class style pada elemen badge status
+    modalStatus.className = ''; 
+
+    // Penkondisian status berdasarkan nilai dari database
+    if (status === 'pending') {
+      modalStatus.classList.add('status-badge', 'pending');
+      modalStatus.textContent = 'PENDING';
+    } else if (status === 'approve' || status === 'approved' || status === 'selesai') {
+      modalStatus.classList.add('status-badge', 'approved');
+      modalStatus.textContent = 'DISETUJUI';
+    } else if (status === 'reject' || status === 'rejected') {
+      modalStatus.classList.add('status-badge', 'reject');
+      modalStatus.textContent = 'DITOLAK';
+    } else {
+      // Cadangan jika status bernilai lain
+      modalStatus.classList.add('status-badge', 'pending');
+      modalStatus.textContent = status.toUpperCase();
+    }
 
       detailsModal.showModal();
     }

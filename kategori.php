@@ -97,7 +97,7 @@ if (isset($_SESSION['toast_msg'])) {
           <span class="menu-title" style="margin-top: 1rem;">Laporan</span>
           <ul class="menu-items">
             <li>
-              <a href="statistik.php" class="menu-link">
+              <a href="statistik.php" class="menu-link" >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 Statistik
               </a>
