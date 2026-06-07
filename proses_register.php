@@ -26,10 +26,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama_lengkap = trim($_POST['nama_lengkap']);
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
+    $nim = trim($_POST['nim']);
+    $email = trim($_POST['email']);
+    $prodi = trim($_POST['prodi']);
+    $angkatan = trim($_POST['angkatan']);
+    $no_hp = trim($_POST['no_hp']);
+
+
     
     // BLOK 2A: Validasi Input Kosong
     // Pastikan pengguna tidak mengirimkan form yang kosong. Jika ada yang kosong, kembalikan error.
-    if (empty($nama_lengkap) || empty($username) || empty($password)) {
+    if (empty($nama_lengkap) || empty($username) || empty($password) || empty($nim) ||empty($email) ||empty($prodi) || empty($angkatan) || empty($no_hp)) {
         $_SESSION['register_error'] = "Semua kolom wajib diisi!";
         header("Location: register.php");
         exit();
@@ -60,8 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = 'peserta'; 
     
     // Memasukkan data akun baru ke dalam tabel 'users'
-    $insert_stmt = mysqli_prepare($koneksi, "INSERT INTO users (nama_lengkap, username, password, role) VALUES (?, ?, ?, ?)");
-    mysqli_stmt_bind_param($insert_stmt, "ssss", $nama_lengkap, $username, $hashed_password, $role);
+    $insert_stmt = mysqli_prepare($koneksi, "INSERT INTO users (nim, username, nama_lengkap, email, password, role, prodi, angkatan, no_hp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($insert_stmt, "sssssssss", $nim, $username, $nama_lengkap, $email, $hashed_password, $role, $prodi, $angkatan, $no_hp);
     
     // Eksekusi penyimpanan. Jika berhasil, buat pesan sukses. Jika gagal, buat pesan error.
     if (mysqli_stmt_execute($insert_stmt)) {

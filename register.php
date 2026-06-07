@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'koneksi.php';
 
 if (isset($_SESSION['user_role'])) {
     header("Location: dashboard.php");
@@ -42,26 +43,71 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
         <?php endif; ?>
 
         <form action="proses_register.php" method="POST">
-          <div class="login-input-group">
-            <label for="nama_lengkap">Nama Lengkap</label>
-            <div class="input-wrapper">
-              <input type="text" id="nama_lengkap" name="nama_lengkap" class="input-text clean-input" placeholder="Masukkan nama lengkap" required autocomplete="off">
+          <div class="form-row-2">
+
+            <div class="login-input-group">
+              <label for="username">Username</label>
+              <div class="input-wrapper">
+                <input type="text" id="username" name="username" class="input-text clean-input" placeholder="Buat username" required autocomplete="off">
+              </div>
             </div>
+
+            <div class="login-input-group" style="margin-bottom: 2rem;">
+              <label for="password">Password</label>
+              <div class="input-wrapper">
+                <input type="password" id="password" name="password" class="input-text clean-input" placeholder="Buat password" required>
+              </div>
+            </div>
+
+            <div class="login-input-group">
+              <label for="nim">NIM</label>
+              <div class="input-wrapper">
+                <input type="text" id="nim" name="nim" class="input-text clean-input" placeholder="Masukkan nim anda" required autocomplete="off">
+              </div>
+            </div>
+
+            <div class="login-input-group">
+              <label for="nama_lengkap">Nama Lengkap</label>
+              <div class="input-wrapper">
+                <input type="text" id="nama_lengkap" name="nama_lengkap" class="input-text clean-input" placeholder="Masukkan nama lengkap" required autocomplete="off">
+              </div>
+            </div>
+
+            <div class="login-input-group" style="margin-bottom: 2rem;">
+              <label for="email">Email</label>
+              <div class="input-wrapper">
+                <input type="email" id="email" name="email" class="input-text clean-input" placeholder="Masukkan Email" required>
+              </div>
+            </div>
+
+            <div class="login-input-group" style="margin-bottom: 2rem;">
+              <label for="email">Prodi</label>
+              <div class="input-wrapper">
+                <select name="prodi" id="prodi" class="clean-input">
+                  <option value="">Pilih Prodi</option>
+                  <option value="informatika">Informatika</option>
+                  <option value="sistem_informasi">Sistem Informasi</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="login-input-group" style="margin-bottom: 2rem;">
+              <label for="angkatan">Angkatan</label>
+              <div class="input-wrapper">
+                <input type="text" id="angkatan" name="angkatan" class="input-text clean-input" placeholder="Masukkan tahun masuk anda" required>
+              </div>
+            </div>
+
+            <div class="login-input-group" style="margin-bottom: 2rem;">
+              <label for="no_hp">Nomor Hp</label>
+              <div class="input-wrapper">
+                <input type="text" id="no_hp" name="no_hp" class="input-text clean-input" placeholder="Masukkan nomor hp yang aktif" required>
+              </div>
+            </div>
+
+            
           </div>
 
-          <div class="login-input-group">
-            <label for="username">Username</label>
-            <div class="input-wrapper">
-              <input type="text" id="username" name="username" class="input-text clean-input" placeholder="Buat username" required autocomplete="off">
-            </div>
-          </div>
-
-          <div class="login-input-group" style="margin-bottom: 2rem;">
-            <label for="password">Password</label>
-            <div class="input-wrapper">
-              <input type="password" id="password" name="password" class="input-text clean-input" placeholder="Buat password" required>
-            </div>
-          </div>
 
           <button type="submit" class="login-btn">Daftar Sekarang</button>
 

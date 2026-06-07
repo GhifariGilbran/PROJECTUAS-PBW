@@ -484,9 +484,9 @@ tr:last-child td {
 .login-wrapper-clean,
 .login-layout {
   width: 100%;
-  max-width: 420px;
   padding: 1.5rem;
-  margin: auto;
+  display: flex;
+  justify-content: center;
 }
 .login-box-clean,
 .login-card {
@@ -495,8 +495,9 @@ tr:last-child td {
   border-radius: 16px;
   padding: 2.5rem 2rem;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  width: 100%;
+  width: 750px;
   height: auto;
+
 }
 
 /* Header Login */
@@ -537,6 +538,7 @@ tr:last-child td {
 /* Input Fields Login */
 .login-input-group {
   margin-bottom: 1.25rem;
+  
 }
 .login-input-group label {
   display: block;
@@ -557,6 +559,8 @@ tr:last-child td {
   padding: 0 1rem;
   border-radius: 10px;
   outline: none;
+  box-sizing: border-box;
+  display: block;
 }
 .clean-input:focus {
   border-color: var(--accent-blue) !important;
@@ -691,6 +695,7 @@ tr:last-child td {
   flex-direction: column;
   gap: 1.25rem;
 }
+
 
 .search-input-group {
   position: relative;
