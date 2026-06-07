@@ -115,16 +115,68 @@ if (isset($_SESSION['toast_msg'])) {
         $id_pengguna = $_GET['id'];
         $data_user = mysqli_query($koneksi, "SELECT * FROM users WHERE id = $id_pengguna");
         $u = mysqli_fetch_assoc($data_user);
+        ?>
 
-        if($u['role'] === 'admin' && 'panitia'){ ?>
+      <form action="proses_update_pengguna.php" method="post">
+        <input type="hidden" name="id" value="<?= $id_pengguna ?>">
+        <input type="hidden" name="role" value="<?= $u['role'] ?>">
+        
+        <div class="form-row-2">
+          
+          <div class="form-group">
+            <h3>Username</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">Kosongkan jika tidak ingin mengubah password</p>          
+            <input name="username" class="input-text" type="text" value="<?= htmlspecialchars($u['username']) ?>" required>
+          </div>
 
-          <form action="" method="post">
-            <h3>username</h3>
-            <input class="input-text" type="text">
-          </form>
+          <div class="form-group">
+            <h3>Password</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">Kosongkan jika tidak ingin mengubah password</p>
+            <input name="password" class="input-text" type="password" placeholder="Masukkan password baru">
+          </div>
 
-        <?php }else{ ?>
-        <?php } ?>
+          <?php if ($u['role'] === 'peserta'): ?>
+            <div class="form-group">
+              <h3>NIM / ID Peserta</h3>
+              <input name="nim" class="input-text" type="text" value="<?= htmlspecialchars($u['nim'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+              <h3>Nama Lengkap</h3>
+              <input name="nama_lengkap" class="input-text" type="text" value="<?= htmlspecialchars($u['nama_lengkap'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+              <h3>Email</h3>
+              <input name="email" class="input-text" type="email" value="<?= htmlspecialchars($u['email'] ?? '') ?>">
+            </div>
+          <?php endif; ?>
+
+          <?php if ($u['role'] === 'panitia' || $u['role'] === 'peserta'): ?>
+            <div class="form-group">
+              <h3>Program Studi</h3>
+              <input name="prodi" class="input-text" type="text" value="<?= htmlspecialchars($u['prodi'] ?? '') ?>">
+            </div>
+          <?php endif; ?>
+
+          <?php if ($u['role'] === 'peserta'): ?>
+            <div class="form-group">
+              <h3>Angkatan</h3>
+              <input name="angkatan" class="input-text" type="text" value="<?= htmlspecialchars($u['angkatan'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+              <h3>No. HP</h3>
+              <input name="no_hp" class="input-text" type="text" value="<?= htmlspecialchars($u['no_hp'] ?? '') ?>">
+            </div>
+          <?php endif; ?>
+
+        </div>
+
+        <button type="submit" class="btn-submit" style="margin-top: 1.5rem;">Simpan Perubahan</button>
+      </form>
+
+      
     </main>
 
   </div>

@@ -110,17 +110,29 @@ if (isset($_SESSION['toast_msg'])) {
         <div class="view-header">
           <h2 class="view-title">Kelola Pengguna</h2>
         </div>
-        <form method="GET">
-        <?php $pilihanakun = $_GET['pilihanakun'] ?? ''; ?>
 
-        <select class="input-text" name="pilihanakun" id="pilihanakun" onchange="this.form.submit()">
-            <option value="" <?= $pilihanakun == '' ? 'selected' : '' ?>>Semua</option>
-            <option value="admin" <?= $pilihanakun == 'admin' ? 'selected' : '' ?>>Admin</option>
-            <option value="panitia" <?= $pilihanakun == 'panitia' ? 'selected' : '' ?>>Panitia</option>
-            <option value="peserta" <?= $pilihanakun == 'peserta' ? 'selected' : '' ?>>Peserta</option>
-        </select>
+        <form method="GET" action="kelola_pengguna.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+          <?php 
+          $pilihanakun = $_GET['pilihanakun'] ?? ''; 
+          $search = $_GET['search'] ?? ''; 
+          ?>
+
+          <select class="input-text" name="pilihanakun" id="pilihanakun" onchange="this.form.submit()" style="max-width: 200px; margin: 0;">
+              <option value="" <?= $pilihanakun == '' ? 'selected' : '' ?>>Semua Role</option>
+              <option value="admin" <?= $pilihanakun == 'admin' ? 'selected' : '' ?>>Admin</option>
+              <option value="panitia" <?= $pilihanakun == 'panitia' ? 'selected' : '' ?>>Panitia</option>
+              <option value="peserta" <?= $pilihanakun == 'peserta' ? 'selected' : '' ?>>Peserta</option>
+          </select>
+
+          <input type="text" name="search" class="input-text" placeholder="Cari username atau nama..." value="<?= htmlspecialchars($search) ?>" style="max-width: 300px; margin: 0;">
+
+          <button type="submit" class="btn-submit" style="padding: 0.6rem 1.5rem; margin: 0; width: auto;">Cari</button>
+          
+          <?php if (!empty($pilihanakun) || !empty($search)): ?>
+            <a href="kelola_pengguna.php" class="btn-sm btn-reject" style="text-decoration: none; padding: 0.6rem 1rem; line-height: 1.5; display: inline-flex; align-items: center;">Reset</a>
+          <?php endif; ?>
         </form>
-        <br>
+
         <div class="table-container">
           <table>
             <thead>
@@ -134,40 +146,52 @@ if (isset($_SESSION['toast_msg'])) {
             </thead>
             <tbody>
               <?php
+              // Tangkap data filter & keyword pencarian
               $pilihanakun = $_GET['pilihanakun'] ?? '';
-              ?>
-              
+              $search_keyword = isset($_GET['search']) ? mysqli_real_escape_string($koneksi, trim($_GET['search'])) : '';
 
-              <?php
-                if ($pilihanakun == '') {
-                    $users_res = mysqli_query($koneksi, "SELECT * FROM users ORDER BY id DESC");
-                } else {
-                    $users_res = mysqli_query($koneksi, "SELECT * FROM users WHERE role = '$pilihanakun' ORDER BY id DESC");
-                }
-                $no = 1;
-                if(mysqli_num_rows($users_res) > 0) {
-                    while($u = mysqli_fetch_assoc($users_res)):
+              // Susun query dasar SQL
+              $query_sql = "SELECT * FROM users WHERE 1=1";
+
+              // Gabungkan filter Role jika dipilih
+              if ($pilihanakun != '') {
+                  $query_sql .= " AND role = '$pilihanakun'";
+              }
+
+              // Gabungkan filter Kata Kunci jika diisi
+              if ($search_keyword != '') {
+                  $query_sql .= " AND (username LIKE '%$search_keyword%' OR nama_lengkap LIKE '%$search_keyword%')";
+              }
+
+              // Urutkan data berdasarkan ID terbesar
+              $query_sql .= " ORDER BY id DESC";
+
+              // Eksekusi query gabungan database
+              $users_res = mysqli_query($koneksi, $query_sql);
+              
+              $no = 1;
+              if(mysqli_num_rows($users_res) > 0) {
+                  while($u = mysqli_fetch_assoc($users_res)):
               ?>
               <tr>
                 <td><?php echo $no++; ?></td>
                 <td><?php echo htmlspecialchars($u['username']); ?></td>
-                <td><?php echo htmlspecialchars($u['nama_lengkap']); ?></td>
-                <td><span class="status-badge" style="color:var(--accent-blue)"><?php echo htmlspecialchars($u['role']); ?></span></td>
+                <td><?php echo htmlspecialchars($u['nama_lengkap'] ?? '-'); ?></td>
+                <td><span class="status-badge" style="color:var(--accent-blue)"><?php echo htmlspecialchars(ucfirst($u['role'])); ?></span></td>
                 <td class="actions-cell">
                   <?php if($u['role'] !== 'admin'){ ?>
                     <a href="kelola_pengguna.php?action=delete&id=<?php echo $u['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');" class="btn-sm btn-reject" style="text-decoration:none;">Hapus</a>
                   <?php } ?>
 
-                    <a href="edit_pengguna.php?action=&id=<?php echo $u['id']; ?>"  class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
-
-                  </td>
+                    <a href="edit_pengguna.php?id=<?php echo $u['id']; ?>" class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
+                </td>
               </tr>
               <?php 
                   endwhile;
               } else {
               ?>
               <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Belum ada pengguna.</td>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Data pengguna tidak ditemukan.</td>
               </tr>
               <?php } ?>
             </tbody>

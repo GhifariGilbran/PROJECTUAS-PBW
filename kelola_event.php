@@ -103,6 +103,16 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
           <a href="tambah_event.php" class="btn-submit">+ Tambah Event</a>
         </div>
 
+        <form method="GET" action="kelola_event.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+          <?php $search = $_GET['search'] ?? ''; ?>
+          <input type="text" name="search" class="input-text" placeholder="Cari nama event..." value="<?= htmlspecialchars($search) ?>" style="max-width: 300px; margin: 0;">
+          <button type="submit" class="btn-submit" style="padding: 0.6rem 1.5rem; margin: 0; width: auto;">Cari</button>
+          
+          <?php if (!empty($search)): ?>
+            <a href="kelola_event.php" class="btn-sm btn-reject" style="text-decoration: none; padding: 0.6rem 1rem; line-height: 1.5;">Reset</a>
+          <?php endif; ?>
+        </form>
+
         <div class="table-container">
           <table>
             <thead>
@@ -110,27 +120,48 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
             </thead>
             <tbody>
               <?php
+              // Menangkap keyword pencarian dan mengamankannya dari SQL Injection
+              $search_keyword = isset($_GET['search']) ? mysqli_real_escape_string($koneksi, trim($_GET['search'])) : '';
 
+              // Query dasar
+              $query_sql = "SELECT * FROM events WHERE 1=1";
 
-              $res = mysqli_query($koneksi, "SELECT * FROM events ORDER BY id DESC");
+              // Jika input search diisi, tambahkan kondisi filter LIKE
+              if ($search_keyword != '') {
+                  $query_sql .= " AND name LIKE '%$search_keyword%'";
+              }
+
+              $query_sql .= " ORDER BY id DESC";
+              $res = mysqli_query($koneksi, $query_sql);
               $no = 1;
 
-              while($row = mysqli_fetch_assoc($res)):
-              $kategori_id = $row['category_id'];
-              
-              $kategori = mysqli_query($koneksi, "SELECT * FROM categories WHERE id = $kategori_id");
-              $kategori = mysqli_fetch_assoc($kategori);
+              if (mysqli_num_rows($res) > 0) {
+                  while($row = mysqli_fetch_assoc($res)):
+                  $kategori_id = $row['category_id'];
+                  
+                  $kategori_query = mysqli_query($koneksi, "SELECT * FROM categories WHERE id = $kategori_id");
+                  $kategori = mysqli_fetch_assoc($kategori_query);
+                  
+                  // Mengamankan data kategori jika ada id kategori yang tidak valid/dihapus
+                  $nama_kategori = $kategori ? $kategori['nama'] : 'Tanpa Kategori';
               ?>
               <tr>
                 <td><?php echo $no++; ?></td>
                 <td><?php echo htmlspecialchars($row['name']); ?></td>
-                <td><?php echo htmlspecialchars($kategori['nama']); ?></td>
+                <td><?php echo htmlspecialchars($nama_kategori); ?></td>
                 <td><span class="status-badge <?php echo strtolower($row['status']); ?>"><?php echo $row['status']; ?></span></td>
                 <td>
                   <a href="proses_hapus_event.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin hapus?');" class="btn-sm btn-reject">Hapus</a>
                 </td>
               </tr>
-              <?php endwhile; ?>
+              <?php 
+                  endwhile;
+              } else {
+              ?>
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Event tidak ditemukan.</td>
+              </tr>
+              <?php } ?>
             </tbody>
           </table>
         </div>
