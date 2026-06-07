@@ -13,7 +13,7 @@ include 'koneksi.php';
 // BLOK 1: Proteksi Halaman Khusus Admin
 // Memastikan hanya pengguna yang sudah login DAN memiliki role 'admin' yang bisa mengakses proses ini.
 // Jika peserta biasa atau orang belum login mencoba mengakses file ini, tendang mereka ke dashboard.
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'panitia')) {
     header("Location: dashboard.php");
     exit();
 }
