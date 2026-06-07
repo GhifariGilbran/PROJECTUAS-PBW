@@ -4,7 +4,7 @@ include 'koneksi.php';
 
 // Redirect to login if session doesn't exist
 if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'panitia')) {
-    header("Location: dashboard.php");
+    header("Location: login.php");
     exit();
 }
 

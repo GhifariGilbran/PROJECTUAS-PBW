@@ -64,6 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Jika proses gagal atau diakses secara ilegal (tanpa POST), kembalikan ke index.php
-header("Location: index.php");
+header("Location: login.php");
 exit();
 ?>

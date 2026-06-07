@@ -3,7 +3,11 @@ session_start();
 
 // Redirect to dashboard if already logged in
 if (isset($_SESSION['user_role'])) {
-    header("Location: dashboard.php");
+    if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'panitia') {
+        header("Location: dashboard.php");
+    } else {
+        header("Location: dashboard_peserta.php"); 
+    }
     exit();
 }
 
