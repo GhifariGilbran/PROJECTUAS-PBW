@@ -61,10 +61,61 @@ if (isset($_SESSION['toast_msg'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard UniVent</title>
   <link rel="stylesheet" href="style.css?v=1.1">
+  <style>
+    /* CSS Tambahan Khusus Dashboard Panitia - Sisipan Grid Layout */
+    .panitia-grid-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    .quick-action-container {
+        background-color: var(--bg-card);
+        border: 1px solid #2d2d34;
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .quick-action-card {
+        background-color: #2b2b30;
+        border: 1px solid #3d3d45;
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+        color: #fff;
+        transition: background-color 0.2s;
+    }
+    .quick-action-card:hover {
+        background-color: #38383f;
+    }
+    .quick-action-text h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    .quick-action-text p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .arrow-icon {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    @media (max-width: 992px) {
+        .panitia-grid-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
   <header>
     <div class="logo-container">
       <h1 class="logo-title">Uni<span>Vent</span></h1>
@@ -73,9 +124,7 @@ if (isset($_SESSION['toast_msg'])) {
     
     <div class="header-right">
       <div class="user-profile-meta">
-        <span class="user-info-text">
-    <?php echo htmlspecialchars($username ?? ''); ?>
-</span>
+        <span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>
         <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
       </div>
       
@@ -85,11 +134,9 @@ if (isset($_SESSION['toast_msg'])) {
 
   <div class="app-container">
     
-    <!-- Sidebar -->
     <aside id="sidebar">
       
       <?php if ($role === 'admin'): ?>
-        <!-- ADMIN MENU -->
         <div class="menu-group">
           <span class="menu-title">Menu Utama</span>
           <ul class="menu-items">
@@ -135,8 +182,45 @@ if (isset($_SESSION['toast_msg'])) {
             </li>
           </ul>
         </div>
+
+      <?php elseif ($role === 'panitia'): ?>
+        <div class="menu-group">
+          <span class="menu-title">Menu Utama</span>
+          <ul class="menu-items">
+            <li>
+              <a href="dashboard.php" class="menu-link active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="buat_event.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                Buat Event
+              </a>
+            </li>
+            <li>
+              <a href="event_saya.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                Event Saya
+              </a>
+            </li>
+            <li>
+              <a href="peserta.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                Peserta
+              </a>
+            </li>
+            <li>
+              <a href="sertifikat.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Sertifikat
+              </a>
+            </li>
+          </ul>
+        </div>
+
       <?php else: ?>
-        <!-- PESERTA MENU -->
         <div class="menu-group">
           <span class="menu-title">Menu Utama</span>
           <ul class="menu-items">
@@ -170,11 +254,9 @@ if (isset($_SESSION['toast_msg'])) {
 
     </aside>
 
-    <!-- Main Content Area -->
     <main>
 
       <?php if ($role === 'admin'): ?>
-        <!-- ================= ADMIN VIEW ================= -->
         <?php
         // Fetch Admin Statistics from database
         $total_res = mysqli_query($koneksi, "SELECT COUNT(*) as count FROM events");
@@ -191,7 +273,6 @@ if (isset($_SESSION['toast_msg'])) {
             <h2 class="view-title">Dashboard Admin</h2>
           </div>
 
-          <!-- Metric Cards -->
           <div class="stats-grid admin-stats-grid">
             
             <div class="stat-card">
@@ -232,7 +313,6 @@ if (isset($_SESSION['toast_msg'])) {
 
           </div>
 
-          <!-- Table Banner and Content -->
           <div class="section-banner">Event Menunggu Persetujuan</div>
           <div class="table-container">
             <table>
@@ -301,8 +381,125 @@ if (isset($_SESSION['toast_msg'])) {
           </div>
         </section>
 
+      <?php elseif ($role === 'panitia'): ?>
+        <?php
+        // Query metrik data dinamis khusus milik panitia yang login
+        $total_created_res = mysqli_query($koneksi, "SELECT COUNT(*) as count FROM events WHERE panitia_id = $user_id");
+        $total_created_events = mysqli_fetch_assoc($total_created_res)['count'] ?? 0;
+
+        $total_part_res = mysqli_query($koneksi, "SELECT COUNT(r.id) as count FROM registration r 
+                                                  JOIN events e ON r.event_id = e.id 
+                                                  WHERE e.panitia_id = $user_id");
+        $total_my_peserta = mysqli_fetch_assoc($total_part_res)['count'] ?? 0;
+
+        $panitia_pending_res = mysqli_query($koneksi, "SELECT COUNT(*) as count FROM events WHERE panitia_id = $user_id AND status = 'Pending'");
+        $panitia_pending_count = mysqli_fetch_assoc($panitia_pending_res)['count'] ?? 0;
+        ?>
+        <section id="panitia-dashboard-view" class="view-section active">
+          <div class="view-header">
+            <h2 class="view-title">Dashboard Panitia</h2>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Total Event Dibuat</span>
+              <span class="stat-value"><?php echo $total_created_events; ?></span>
+              <span class="stat-sublabel">Dari Semua Event</span>
+            </div>
+            
+            <div class="stat-card">
+              <span class="stat-label">Total Peserta</span>
+              <span class="stat-value" style="color: #5ce1e6;"><?php echo $total_my_peserta; ?></span>
+              <span class="stat-sublabel">Dari Semua Event</span>
+            </div>
+            
+            <div class="stat-card">
+              <span class="stat-label">Menunggu Persetujuan</span>
+              <span class="stat-value pending"><?php echo $panitia_pending_count; ?></span>
+              <span class="stat-sublabel pending" style="color: #ffaf94;">Sedang Di Tinjau Admin</span>
+            </div>
+          </div>
+
+          <div class="panitia-grid-layout">
+            
+            <div>
+              <div class="section-banner" style="background-color: rgba(92, 225, 230, 0.1); color: #5ce1e6; padding: 1rem 1.5rem; font-weight: 700; border-radius: 12px 12px 0 0; border: 1px solid #2d2d34; border-bottom: none;">
+                Event Yang Anda Buat
+              </div>
+              <div class="table-container" style="border-radius: 0 0 12px 12px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nama Event</th>
+                      <th>Tanggal Dibuat</th>
+                      <th>Kuota</th>
+                      <th>Status</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                    $my_evt_query = mysqli_query($koneksi, "SELECT * FROM events WHERE panitia_id = $user_id ORDER BY id DESC");
+                    $has_evt = false;
+                    while ($row_evt = mysqli_fetch_assoc($my_evt_query)):
+                        $has_evt = true;
+                        $status_class = (strtolower($row_evt['status']) === 'pending') ? 'pending' : ((strtolower($row_evt['status']) === 'approved' || strtolower($row_evt['status']) === 'approve' || strtolower($row_evt['status']) === 'selesai') ? 'approved' : 'reject');
+                    ?>
+                      <tr>
+                        <td class="event-name-cell"><?php echo htmlspecialchars($row_evt['name']); ?></td>
+                        <td><?php echo date('d - m - Y', strtotime($row_evt['created_at'])); ?></td>
+                        <td><?php echo htmlspecialchars($row_evt['quota']); ?></td>
+                        <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($row_evt['status']); ?></span></td>
+                        <td>
+                          <button class="btn-detail" onclick="viewEventDetails(
+                            `<?php echo htmlspecialchars($row_evt['name'], ENT_QUOTES, 'UTF-8'); ?>`, 
+                            'Anda (Panitia)', 
+                            `<?php echo $row_evt['quota']; ?>`, 
+                            `<?php echo $row_evt['created_at']; ?>`, 
+                            `<?php echo $row_evt['status']; ?>`, 
+                            `<?php echo htmlspecialchars($row_evt['deskripsi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>`
+                          )">Detail &rarr;</button>
+                        </td>
+                      </tr>
+                    <?php 
+                    endwhile; 
+                    if (!$has_evt):
+                    ?>
+                      <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Anda belum pernah membuat event.</td>
+                      </tr>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-banner" style="background-color: rgba(92, 225, 230, 0.1); color: #5ce1e6; padding: 1rem 1.5rem; font-weight: 700; border-radius: 12px 12px 0 0; border: 1px solid #2d2d34; border-bottom: none;">
+                Aksi Cepat
+              </div>
+              <div class="quick-action-container" style="border-radius: 0 0 12px 12px; border-top: none;">
+                <a href="buat_event.php" class="quick-action-card">
+                    <div class="quick-action-text">
+                        <h4>Buat Event Baru</h4>
+                        <p>Buat Event Untuk di Tinjau Admin</p>
+                    </div>
+                    <div class="arrow-icon">&rarr;</div>
+                </a>
+                <a href="sertifikat.php" class="quick-action-card">
+                    <div class="quick-action-text">
+                        <h4>Upload Sertifikat</h4>
+                        <p>Pilih Event dan Upload Sertifikat</p>
+                    </div>
+                    <div class="arrow-icon">&rarr;</div>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
       <?php else: ?>
-        <!-- ================= PESERTA VIEW ================= -->
         <?php
         // Fetch Participant Statistics from database
         $app_res = mysqli_query($koneksi, "SELECT COUNT(*) as count FROM events WHERE status = 'Approved'");
@@ -331,7 +528,6 @@ if (isset($_SESSION['toast_msg'])) {
             <h2 class="view-title">Dashboard Peserta</h2>
           </div>
 
-          <!-- Metric Cards -->
           <div class="stats-grid">
             
             <div class="stat-card">
@@ -354,7 +550,6 @@ if (isset($_SESSION['toast_msg'])) {
 
           </div>
 
-          <!-- Table of Registered Events -->
           <div class="section-banner" style="background-color: rgba(111, 208, 246, 0.1); color: var(--accent-blue); padding: 1rem 1.5rem; font-weight: 700; border-radius: 12px 12px 0 0; border: 1px solid #2d2d34; border-bottom: none;">
             Event Saya (Terdaftar)
           </div>
@@ -375,12 +570,12 @@ if (isset($_SESSION['toast_msg'])) {
                 <?php
                 // Fetch participant's registered events
                 $my_events_stmt = mysqli_prepare($koneksi, "
-    SELECT e.*, r.waktu_daftar, r.status
-    FROM registration r
-    JOIN events e ON r.event_id = e.id
-    WHERE r.peserta_id = ?
-    ORDER BY r.id DESC
-");
+                    SELECT e.*, r.waktu_daftar, r.status
+                    FROM registration r
+                    JOIN events e ON r.event_id = e.id
+                    WHERE r.peserta_id = ?
+                    ORDER BY r.id DESC
+                ");
                 mysqli_stmt_bind_param($my_events_stmt, "i", $user_id);
                 mysqli_stmt_execute($my_events_stmt);
                 $my_events_res = mysqli_stmt_get_result($my_events_stmt);
@@ -427,12 +622,10 @@ if (isset($_SESSION['toast_msg'])) {
 
   </div>
 
-  <!-- Custom Alert Toast notification -->
   <div id="toast" class="toast <?php echo !empty($toast_msg) ? 'show' : ''; ?> <?php echo ($toast_type === 'success') ? 'toast-success' : ''; ?>">
     <span id="toast-message"><?php echo htmlspecialchars($toast_msg); ?></span>
   </div>
 
-  <!-- Details Modal Dialog -->
   <dialog id="details-modal" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid #2d2d34; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); outline: none;">
     <h3 id="modal-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent-blue);">Nama Event</h3>
     <div style="margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-muted);">
