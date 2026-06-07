@@ -497,7 +497,6 @@ tr:last-child td {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   width: 750px;
   height: auto;
-
 }
 
 /* Header Login */
@@ -538,7 +537,6 @@ tr:last-child td {
 /* Input Fields Login */
 .login-input-group {
   margin-bottom: 1.25rem;
-  
 }
 .login-input-group label {
   display: block;
@@ -696,7 +694,6 @@ tr:last-child td {
   gap: 1.25rem;
 }
 
-
 .search-input-group {
   position: relative;
   display: flex;
@@ -786,7 +783,10 @@ tr:last-child td {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-speed), border-color var(--transition-speed), box-shadow var(--transition-speed);
+  transition:
+    transform var(--transition-speed),
+    border-color var(--transition-speed),
+    box-shadow var(--transition-speed);
 }
 
 .event-card:hover {
@@ -967,113 +967,144 @@ tr:last-child td {
   line-height: 1.5;
 }
 
-
 /* --- RAJIN GRID UNTUK DASHBOARD PESERTA --- */
 .event-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
-    margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
 }
 
 .event-card {
-    background-color: var(--bg-card);
-    border: 1px solid #2d2d34;
-    border-radius: 16px;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
+  background-color: var(--bg-card);
+  border: 1px solid #2d2d34;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.event-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+.event-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-blue);
+}
 
 .event-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
 }
 
-.event-card-body { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+.event-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
 
 .event-category {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--accent-blue);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
 }
 
-.event-title { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-main); }
+.event-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
 
 .event-meta {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 1.5rem;
-    margin-top: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  margin-top: auto;
 }
 
 .btn-detail {
-    color: var(--accent-blue);
-    font-weight: 700;
-    text-decoration: none;
-    font-size: 0.85rem;
+  color: var(--accent-blue);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.85rem;
 }
 
 /* --- Tambahan Layout Event Card --- */
 .event-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
-    margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
 }
 
 .event-card {
-    background-color: var(--bg-card);
-    border: 1px solid #2d2d34;
-    border-radius: 16px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease;
+  background-color: var(--bg-card);
+  border: 1px solid #2d2d34;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
 }
 
-.event-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+.event-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-blue);
+}
 
-.event-card img { width: 100%; height: 180px; object-fit: cover; }
+.event-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
 
-.event-card-body { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+.event-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
 
 .event-category {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--accent-blue);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
 }
 
-.event-title { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-main); }
+.event-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
 
 .event-meta {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 1.5rem;
-    margin-top: auto;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  margin-top: auto;
 }
 
-.event-meta span { display: flex; align-items: center; gap: 8px; }
+.event-meta span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .btn-detail {
-    color: var(--accent-blue);
-    font-weight: 700;
-    text-decoration: none;
-    font-size: 0.85rem;
+  color: var(--accent-blue);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.85rem;
 }
 
 /* --- EVENT DETAIL PAGE --- */
@@ -1341,7 +1372,9 @@ tr:last-child td {
   padding: 0.85rem 1rem;
   color: var(--text-main);
   font-size: 0.95rem;
-  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  transition:
+    border-color var(--transition-speed),
+    box-shadow var(--transition-speed);
   width: 100%;
   outline: none;
 }
@@ -1372,7 +1405,9 @@ select.input-text option {
   padding: 0.85rem 1rem;
   color: var(--text-main);
   font-size: 0.95rem;
-  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  transition:
+    border-color var(--transition-speed),
+    box-shadow var(--transition-speed);
   width: 100%;
   min-height: 120px;
   resize: vertical;
@@ -1419,4 +1454,336 @@ select.input-text option {
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+}
+
+/* ==========================================
+   STYLING UNTUK HALAMAN UPLOAD SERTIFIKAT
+   ========================================== */
+
+.certificate-container {
+  max-width: 900px;
+  margin-top: 1rem;
+}
+
+.page-header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.page-header-subtitle {
+  font-size: 0.9rem;
+  color: #b3b3b8; /* Jika var(--text-muted) tidak terdefinisi */
+  margin-bottom: 2rem;
+}
+
+.form-group-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.search-flex-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  align-items: center;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-input-wrapper svg {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0a0a9;
+}
+
+.input-custom {
+  width: 100%;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 30px;
+  padding: 0.75rem 1rem 0.75rem 2.8rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.btn-cyan {
+  background-color: #7ce4fa;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 0.7rem 2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cyan:hover {
+  background-color: #5ce1e6;
+}
+
+.instructions-box {
+  color: #b3b3b8;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.instructions-box h4 {
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.instructions-box ol {
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.link-submit-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  max-width: 600px;
+  margin-top: 1rem;
+}
+
+.link-input {
+  flex: 1;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.link-input::placeholder {
+  color: #a0a0a9;
+}
+
+/* Notifikasi Status Sukses / Gagal */
+.alert-msg {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.alert-success {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+.alert-error {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+/* =============================================
+   peserta_panitia.css
+   Style khusus halaman Kelola Peserta Panitia
+   ============================================= */
+
+/* ── Sidebar active state ── */
+.menu-link--active {
+  background-color: #cbeff7;
+  color: #000 !important;
+  border-radius: 12px;
+}
+
+/* ── User info role di header ── */
+.user-info-role {
+  color: #fff;
+  text-align: right;
+  font-weight: 700;
+}
+
+/* ── Alert / Notifikasi ── */
+.pp-alert {
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.pp-alert--success {
+  background: #0d3b2e;
+  color: #4ade80;
+  border: 1px solid #166534;
+}
+
+.pp-alert--error {
+  background: #3b1c1c;
+  color: #f87171;
+  border: 1px solid #991b1b;
+}
+
+.pp-alert--info {
+  background: #1c2e4a;
+  color: #60a5fa;
+  border: 1px solid #1e40af;
+}
+
+/* ── Label event hasil pencarian ── */
+.pp-event-label-wrap {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.pp-event-label {
+  display: inline-block;
+  background: #0891b2;
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ── Kartu ringkasan ── */
+.pp-summary-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.pp-summary-card {
+  background: #0f1923;
+  border: 1px solid #1e2a3a;
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.pp-summary-num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.pp-summary-num--hadir {
+  color: #4ade80;
+}
+.pp-summary-num--terdaftar {
+  color: #60a5fa;
+}
+.pp-summary-num--tidak {
+  color: #f87171;
+}
+
+.pp-summary-label {
+  font-size: 0.72rem;
+  color: #6b8299;
+  margin-top: 2px;
+}
+
+/* ── Tabel Peserta ── */
+.pp-table-wrapper {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.pp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.pp-table thead tr {
+  background: #1e2a3a;
+  color: #a0b4c8;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.pp-table th,
+.pp-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #1e2a3a;
+  white-space: nowrap;
+}
+
+.pp-table tbody tr {
+  background: #0f1923;
+  color: #d0dce8;
+  transition: background 0.15s;
+}
+
+.pp-table tbody tr:hover {
+  background: #162032;
+}
+
+/* ── Badge Status ── */
+.pp-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.pp-badge--hadir {
+  background: #0d3b2e;
+  color: #4ade80;
+}
+
+.pp-badge--terdaftar {
+  background: #1c2e4a;
+  color: #60a5fa;
+}
+
+.pp-badge--tidak_hadir {
+  background: #3b1c1c;
+  color: #f87171;
+}
+
+/* ── Form Aksi per baris ── */
+.pp-aksi-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pp-select {
+  background: #1e2a3a;
+  color: #d0dce8;
+  border: 1px solid #2e3f54;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.pp-btn-update {
+  background: #0891b2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pp-btn-update:hover {
+  background: #0e7490;
 }
