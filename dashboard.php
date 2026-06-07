@@ -8,9 +8,9 @@ if (!isset($_SESSION['user_role'])) {
     exit();
 }
 
-$role = $_SESSION['user_role'];
-$username = $_SESSION['username'];
-$user_id = $_SESSION['user_id'];
+$role = $_SESSION['user_role'] ?? '';
+$username = $_SESSION['username'] ?? '';
+$user_id = $_SESSION['user_id'] ?? 0;
 
 // Handle Admin Action (Approve / Reject)
 if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
@@ -73,7 +73,9 @@ if (isset($_SESSION['toast_msg'])) {
     
     <div class="header-right">
       <div class="user-profile-meta">
-        <span class="user-info-text"><?php echo htmlspecialchars($username); ?></span>
+        <span class="user-info-text">
+    <?php echo htmlspecialchars($username ?? ''); ?>
+</span>
         <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
       </div>
       
@@ -306,7 +308,7 @@ if (isset($_SESSION['toast_msg'])) {
         $app_res = mysqli_query($koneksi, "SELECT COUNT(*) as count FROM events WHERE status = 'Approved'");
         $total_approved = mysqli_fetch_assoc($app_res)['count'];
 
-        $my_reg_stmt = mysqli_prepare($koneksi, "SELECT COUNT(*) as count FROM registrations WHERE user_id = ?");
+        $my_reg_stmt = mysqli_prepare($koneksi, "SELECT COUNT(*) as count FROM registration WHERE id = ?");
         mysqli_stmt_bind_param($my_reg_stmt, "i", $user_id);
         mysqli_stmt_execute($my_reg_stmt);
         $my_reg_res = mysqli_stmt_get_result($my_reg_stmt);
@@ -315,7 +317,7 @@ if (isset($_SESSION['toast_msg'])) {
 
         // Fetch user's registered event IDs to mark them in view
         $reg_ids = [];
-        $reg_ids_stmt = mysqli_prepare($koneksi, "SELECT event_id FROM registrations WHERE user_id = ?");
+        $reg_ids_stmt = mysqli_prepare($koneksi, "SELECT event_id FROM registration WHERE id = ?");
         mysqli_stmt_bind_param($reg_ids_stmt, "i", $user_id);
         mysqli_stmt_execute($reg_ids_stmt);
         $reg_ids_res = mysqli_stmt_get_result($reg_ids_stmt);
@@ -373,12 +375,12 @@ if (isset($_SESSION['toast_msg'])) {
                 <?php
                 // Fetch participant's registered events
                 $my_events_stmt = mysqli_prepare($koneksi, "
-                    SELECT e.*, r.registration_date, r.presence_status 
-                    FROM registrations r 
-                    JOIN events e ON r.event_id = e.id 
-                    WHERE r.user_id = ? 
-                    ORDER BY r.id DESC
-                ");
+    SELECT e.*, r.waktu_daftar, r.status
+    FROM registration r
+    JOIN events e ON r.event_id = e.id
+    WHERE r.peserta_id = ?
+    ORDER BY r.id DESC
+");
                 mysqli_stmt_bind_param($my_events_stmt, "i", $user_id);
                 mysqli_stmt_execute($my_events_stmt);
                 $my_events_res = mysqli_stmt_get_result($my_events_stmt);
