@@ -61,7 +61,11 @@ unset($_SESSION['login_error']);
               <span>Akses Admin</span><span>admin / admin123</span>
             </div>
             <div class="demo-credentials-item">
-              <span>Akses panitia</span><span>panitia / panitia</span>
+              <span>Akses panitia</span><span>panitiaif / panitiaif123</span>
+            </div>
+
+            <div class="demo-credentials-item">
+              <span></span><span>panitiasi / panitiasi123</span>
             </div>
            
             <div class="demo-credentials-item">
