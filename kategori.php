@@ -113,9 +113,7 @@ if (isset($_SESSION['toast_msg'])) {
 
         <span>Ini adalah kategori untuk event</span>
         
-        <?php
-        $kategori = mysqli_query($koneksi, "SELECT * FROM categories ORDER BY id DESC");
-        ?>
+  
 
         <div class="table-container">
           <table>
@@ -131,19 +129,20 @@ if (isset($_SESSION['toast_msg'])) {
             <tbody>
             
               <?php 
+                $kategori = mysqli_query($koneksi, "SELECT * FROM categories ORDER BY id DESC");
                 $no = 1;
                 if(mysqli_num_rows($kategori) > 0) {
-                    while($kategori = mysqli_fetch_assoc($kategori)):
+                    while($ktgr = mysqli_fetch_assoc($kategori)):
               ?>
 
               <tr>
                 <td><?php echo $no++; ?></td>
-                <td><?php echo htmlspecialchars($kategori['nama']); ?></td>
-                <td><?php echo htmlspecialchars($kategori['deskripsi']); ?></td>
-                <td><?php echo htmlspecialchars($kategori['updated_at']); ?></span></td>
+                <td><?php echo htmlspecialchars($ktgr['nama']); ?></td>
+                <td><?php echo htmlspecialchars($ktgr['deskripsi']); ?></td>
+                <td><?php echo htmlspecialchars($ktgr['updated_at']); ?></span></td>
                 <td class="actions-cell">              
 
-                    <a href="edit_pengguna.php?action=&id=<?php echo $kategori['id']; ?>"  class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
+                    <a href="edit_pengguna.php?action=&id=<?php echo $ktgr['id']; ?>"  class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
 
                   </td>
             </tr>
