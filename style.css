@@ -1787,3 +1787,321 @@ select.input-text option {
 .pp-btn-update:hover {
   background: #0e7490;
 }
+
+/* ═══════════════════════════════════════════════════════
+   dashboard_peserta.css
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Kartu Sambutan ───────────────────────────────────── */
+.welcome-card {
+  background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+  border-radius: 14px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.welcome-card .welcome-left h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.3rem;
+}
+
+.welcome-card .welcome-left p {
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.welcome-card .nim-box {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem 1.75rem;
+  text-align: center;
+  min-width: 160px;
+}
+
+.welcome-card .nim-box .nim-label {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.75rem;
+  display: block;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.welcome-card .nim-box .nim-value {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ── Stat Cards ───────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--card-bg, #1e1e2e);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted, #aaa);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  line-height: 1.1;
+}
+
+.stat-value.blue {
+  color: #6fd0f6;
+}
+.stat-value.green {
+  color: #50dc8c;
+}
+.stat-value.yellow {
+  color: #f6c96f;
+}
+
+.stat-sublabel {
+  font-size: 0.78rem;
+  color: var(--text-muted, #aaa);
+}
+
+.stat-link {
+  color: #6fd0f6;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.stat-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Layout Dua Kolom ─────────────────────────────────── */
+.dashboard-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  align-items: start;
+}
+
+/* ── Panel Base ───────────────────────────────────────── */
+.panel {
+  background: var(--card-bg, #1e1e2e);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.panel-title {
+  padding: 0.9rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted, #aaa);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.panel-title.blue-title {
+  color: #6fd0f6;
+  background: rgba(111, 208, 246, 0.08);
+}
+
+/* ── Event Mendatang ──────────────────────────────────── */
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.upcoming-item:last-child {
+  border-bottom: none;
+}
+.upcoming-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.upcoming-date-badge {
+  background: #1a73e8;
+  border-radius: 8px;
+  min-width: 44px;
+  text-align: center;
+  padding: 0.35rem 0.45rem;
+  flex-shrink: 0;
+}
+
+.upcoming-date-badge .day {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.upcoming-date-badge .mon {
+  display: block;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+}
+
+.upcoming-item-info .ev-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+.upcoming-item-info .ev-loc {
+  font-size: 0.75rem;
+  color: var(--text-muted, #aaa);
+}
+
+.upcoming-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted, #aaa);
+  font-size: 0.85rem;
+}
+
+/* ── Tabel Event Saya ─────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.my-events-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.my-events-panel thead th {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  color: var(--text-muted, #aaa);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+}
+
+.my-events-panel tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-primary, #fff);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.my-events-panel tbody tr:last-child td {
+  border-bottom: none;
+}
+.my-events-panel tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.empty-row {
+  text-align: center;
+  padding: 2rem !important;
+  color: var(--text-muted, #aaa);
+}
+
+/* ── Badge & Kode ─────────────────────────────────────── */
+.kode-unik {
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.reg-badge {
+  padding: 0.2rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.reg-badge.terdaftar {
+  background: rgba(111, 208, 246, 0.15);
+  color: #6fd0f6;
+}
+.reg-badge.hadir {
+  background: rgba(80, 220, 140, 0.15);
+  color: #50dc8c;
+}
+.reg-badge.tidak_hadir {
+  background: rgba(246, 100, 100, 0.15);
+  color: #f66464;
+}
+
+/* ── Tombol Edit ──────────────────────────────────────── */
+.btn-edit-sm {
+  background: #f6a623;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.15s;
+}
+
+.btn-edit-sm:hover {
+  background: #e09520;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .welcome-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
