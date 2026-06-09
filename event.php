@@ -202,7 +202,8 @@ while ($cat = mysqli_fetch_assoc($cat_res)) {
           ?>
             <div class="event-card">
               <div class="event-img-wrapper" style="display:flex;align-items:center;justify-content:center;background:#1a1a1e;height:160px;position:relative;border-bottom:1px solid #2d2d34;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-blue);opacity:0.6;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <!-- <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-blue);opacity:0.6;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> -->
+                <img src="uploads/<?php echo htmlspecialchars($event['poster']); ?>" alt="">
                 <?php if (!empty($event['category_name'])): ?>
                   <span class="event-card-badge"><?php echo htmlspecialchars($event['category_name']); ?></span>
                 <?php endif; ?>

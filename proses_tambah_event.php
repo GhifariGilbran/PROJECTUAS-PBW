@@ -1,18 +1,8 @@
 <?php
-/**
- * File: proses_tambah_event.php
- * Deskripsi: File backend ini bertanggung jawab secara eksklusif untuk memproses penambahan event baru 
- *            yang dikirimkan oleh Admin. File ini akan menerima data form dari tambah_event.php, 
- *            memasukkannya ke database dengan status bawaan 'Approved', lalu mengarahkan Admin 
- *            kembali ke halaman kelola event dengan pesan sukses.
- */
-
 session_start();
 include 'koneksi.php';
 
-// BLOK 1: Proteksi Halaman Khusus Admin
-// Memastikan hanya pengguna yang sudah login DAN memiliki role 'admin' yang bisa mengakses proses ini.
-// Jika peserta biasa atau orang belum login mencoba mengakses file ini, tendang mereka ke dashboard.
+// Proteksi Halaman Khusus Admin & Panitia
 if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'panitia')) {
     header("Location: dashboard.php");
     exit();
@@ -21,57 +11,62 @@ if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_S
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// BLOK 2: Pemrosesan Data Event Baru
-// Proses berjalan saat Admin mengirimkan form (POST request).
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Mengambil semua data yang diinputkan Admin dari form.
     $name = $_POST['name'];
     $panitia = $_POST['panitia'];
     $category = $_POST['category'];
     $tglmulai = $_POST['tglmulai'];
     $tglselesai = $_POST['tglselesai'];
-
     $location = $_POST['location'];
-    // Kuota dikonversi menjadi integer (angka bulat) agar aman.
     $quota = (int)$_POST['quota'];
     $price = $_POST['price'];
     $desc = $_POST['desc'];
-    $poster = $_POST['poster'];
 
-//     echo "<pre>";
-// var_dump($_POST);
-// echo "</pre>";
-// die();
-    
-    // Menetapkan status bawaan 'Approved' (Disetujui) karena event ini dibuat langsung oleh Admin.
+    // --- PROSES UPLOAD GAMBAR BARU (PERBAIKAN) ---
+    if (isset($_FILES['poster']) && $_FILES['poster']['error'] === 0) {
+        $fileTmpPath = $_FILES['poster']['tmp_name'];
+        $fileName = $_FILES['poster']['name'];
+        
+        // Membuat nama file unik agar tidak bentrok (Contoh: 17123456_poster.jpg)
+        $customFileName = time() . '_' . $fileName; 
+        
+        // Tentukan folder tujuan (Pastikan Anda sudah membuat folder bernama 'uploads' di direktori project)
+        $uploadFileDir = 'uploads/';
+        $dest_path = $uploadFileDir . $customFileName;
 
-    // BLOK 2A: Simpan ke Database
-    // Menggunakan prepared statement untuk menghindari injeksi SQL dari karakter aneh yang mungkin terinput.
-    // Query INSERT memasukkan 10 kolom data sekaligus.
+        // Pindahkan file asli ke folder 'uploads'
+        if(move_uploaded_file($fileTmpPath, $dest_path)) {
+            // Jika berhasil pindah folder, nama file unik ini yang disimpan ke database
+            $posterDatabase = $customFileName; 
+        } else {
+            $_SESSION['tambah_event_error'] = "Gagal mengunggah gambar ke folder server. Cek izin folder uploads Anda.";
+            header("Location: tambah_event.php");
+            exit();
+        }
+    } else {
+        $_SESSION['tambah_event_error'] = "Gambar poster wajib diunggah.";
+        header("Location: tambah_event.php");
+        exit();
+    }
+    // ---------------------------------------------
+
+    // Query INSERT (Menyimpan nama file poster saja ke database)
     $stmt = mysqli_prepare($koneksi, "INSERT INTO events (name, panitia_id, category_id, tgl_mulai, tgl_selesai, lokasi, quota, harga, deskripsi, poster) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     
-    // Binding parameter: "sssssissss" berarti (String, String, String, String, String, Integer, String, String, String, String)
-    mysqli_stmt_bind_param($stmt, "siisssiiss", $name, $panitia, $category, $tglmulai, $tglselesai, $location, $quota, $price, $desc, $poster);
+    mysqli_stmt_bind_param($stmt, "siisssiiss", $name, $panitia, $category, $tglmulai, $tglselesai, $location, $quota, $price, $desc, $posterDatabase);
     
-    
-    // Eksekusi penyimpanan dan pengecekan hasilnya
     if (mysqli_stmt_execute($stmt)) {
-        // Jika berhasil tersimpan, siapkan pesan notifikasi toast warna hijau (success)
         $_SESSION['toast_msg'] = "Event berhasil ditambahkan!";
         $_SESSION['toast_type'] = "success";
         mysqli_stmt_close($stmt);
-        
-        // Arahkan Admin kembali ke halaman kelola event agar bisa melihat list terupdate
         header("Location: kelola_event.php");
         exit();
     } else {
-        // Jika gagal tersimpan (misalnya kesalahan koneksi/struktur), kembalikan pesan error ke halaman form
-        $_SESSION['tambah_event_error'] = "Terjadi kesalahan saat menyimpan event.";
+        $_SESSION['tambah_event_error'] = "Terjadi kesalahan saat menyimpan data ke database.";
     }
     mysqli_stmt_close($stmt);
 }
 
-// Jika terjadi error (atau file diakses langsung tanpa POST), kembalikan admin ke halaman form tambah event
 header("Location: tambah_event.php");
 exit();
 ?>

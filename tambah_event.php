@@ -154,7 +154,7 @@ unset($_SESSION['tambah_event_error']);
       <?php endif; ?>
 
       <div class="form-card">
-        <form action="proses_tambah_event.php" method="POST">
+        <form action="proses_tambah_event.php" method="POST" enctype="multipart/form-data">
           <div class="form-row-2">
             <div class="form-group">
               <label class="form-label" for="name">Nama Event</label>
