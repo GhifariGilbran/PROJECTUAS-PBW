@@ -207,6 +207,112 @@ if (isset($_SESSION['toast_msg'])) {
 
     <!-- Main Content Area -->
     <main>
+
+    <?php if ($role === 'admin'): ?>
+  
+        <a href="kelola_event.php" class="btn-back-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali
+      </a>
+      <form action="proses_update_event.php" method="post">
+        <input type="hidden" name="id" value="<?= $event_id; ?>">
+
+        <div class="detail-layout">
+          <!-- Sidebar Detail -->
+            <div class="detail-sidebar">
+              <div class="detail-poster">
+                <?php if (!empty($event['poster'])): ?>
+                  <img src="uploads/<?php echo htmlspecialchars($event['poster']); ?>" alt="Poster Event" style="width:100%; border-radius:8px;">
+                <?php else: ?>
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue); opacity: 0.8;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                <?php endif; ?>
+              </div>
+
+              <div class="detail-meta-box">
+                <div class="detail-meta-title">Detail Informasi</div>
+                <div class="detail-meta-list">
+                  <div class="input-group">
+                    <span class="detail-meta-label">Mulai</span>
+                    <input class="input-text" type="text" name="mulai" id="mulai" value="<?php echo date('Y-m-d', strtotime($event['tgl_mulai'])); ?>">
+                  </div>
+
+                  <div class="input-group">
+                    <span class="detail-meta-label">Selesai</span>
+                    <input class="input-text" type="text" name="selesai" id="selesai" value="<?php echo date('Y-m-d', strtotime($event['tgl_selesai'])); ?>">
+                  </div>
+
+                  <div class="input-group">
+                    <span class="detail-meta-label">Lokasi</span>
+                    <input class="input-text" type="text" name="lokasi" value="<?php echo htmlspecialchars($event['lokasi']); ?>">
+
+                  </div>
+                  <div class="input-group">
+                    <span class="detail-meta-label">Kuota Sisa</span>
+                    <input class="input-text" type="number" name="quota" value="<?php echo htmlspecialchars($event['quota']); ?>">
+                  </div>
+
+                  <div class="input-group">
+                    <span class="detail-meta-label">Biaya</span>
+                    <input class="input-text" type="text" name="harga" value="<?php echo number_format($event['harga'], 0, ',', '.'); ?>" >
+                  </div>
+                  <div class="input-group">
+                    <span class="detail-meta-label">Status</span>
+                    <?php $select = ['pending', 'approve', 'reject']; ?>
+                    <select id="status" name="status" class="input-text" required>
+                      
+                      <?php foreach($select as $status): ?>
+                          <option value="<?= $status ?>" <?= ($event['status'] == $status) ? 'selected' : '' ?>>
+                              <?= $status ?>
+                          </option>
+                      <?php endforeach; ?>       
+
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Content Detail -->
+            <div class="detail-main">
+              <p class="detail-meta-label">Anda sebagai admin, bisa mengedit :</p>
+              <div class="detail-section">
+                <h3 class="detail-section-title">Nama Event</h3>
+                <input class="input-text" type="text" name="nama" id="nama" value="<?php echo htmlspecialchars($event['name']); ?>">
+              </div>
+
+
+
+              <div class="detail-section">
+                <h3 class="detail-section-title">Deskripsi Event</h3>
+                <textarea class="input-text" name="deskripsi" id="deskripsi"><?php 
+                  echo nl2br(htmlspecialchars($event['deskripsi'])); 
+                  ?></textarea>
+              </div>
+
+
+
+              <div class="detail-action-bar">
+                <div class="detail-price-display">
+                  <span class="detail-price-label">Biaya Pendaftaran</span>
+                  <input class="input-text" type="text" value="<?php echo number_format($event['harga'], 0, ',', '.'); ?>" >
+                </div>
+
+              
+                    <button type="submit" class="btn-register-event">Simpan</button>
+              </div>
+            </div>
+        </div>
+      </form>
+    
+      
+    <?php else : ?>
+
+
       <a href="event.php" class="btn-back-link">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         Kembali ke Daftar Event
@@ -295,9 +401,11 @@ if (isset($_SESSION['toast_msg'])) {
               </form>
             <?php endif; ?>
           </div>
-
         </div>
       </div>
+
+      <?php endif; ?>
+
     </main>
 
   </div>

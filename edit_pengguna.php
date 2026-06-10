@@ -125,8 +125,7 @@ if (isset($_SESSION['toast_msg'])) {
           
           <div class="form-group">
             <h3>Username</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted);">Kosongkan jika tidak ingin mengubah password</p>          
-            <input name="username" class="input-text" type="text" value="<?= htmlspecialchars($u['username']) ?>" required>
+            <input name="username" class="input-text" type="text" value="<?= htmlspecialchars($u['username']) ?>">
           </div>
 
           <div class="form-group">

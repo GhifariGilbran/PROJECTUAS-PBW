@@ -90,12 +90,12 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
 
     <main>
         <?php
-        $stats = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total, SUM(status='Pending') as pending, SUM(status='Approved') as approved FROM events"));
+        $stats = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total, SUM(status='Pending') as pending, SUM(status='approve') as approve FROM events"));
         ?>
         <div class="stats-grid" style="display: flex; gap: 1rem; margin-bottom: 2rem; color: black;">
             <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Total: <?php echo (int)$stats['total']; ?></h3></div>
             <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Pending: <?php echo (int)$stats['pending']; ?></h3></div>
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Disetujui: <?php echo (int)$stats['approved']; ?></h3></div>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Disetujui: <?php echo (int)$stats['approve']; ?></h3></div>
         </div>
 
         <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">
@@ -103,12 +103,38 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
           <a href="tambah_event.php" class="btn-submit">+ Tambah Event</a>
         </div>
 
+        <?php
+          $kategori_res = mysqli_query($koneksi, "SELECT * FROM categories ORDER BY nama ASC");
+          $kategori_selected = $_GET['kategori'] ?? '';
+          $search = $_GET['search'] ?? '';
+        ?>
+
         <form method="GET" action="kelola_event.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+          <?php 
+          $pilihanakun = $_GET['kategori'] ?? ''; 
+          $search = $_GET['search'] ?? ''; 
+          ?>
+
+          
+          <select name="kategori" class="input-text" onchange="this.form.submit()" style="max-width: 300px;">
+              <option value="">Semua Kategori</option>
+
+              <?php while($kat = mysqli_fetch_assoc($kategori_res)): ?>
+                  <option value="<?= $kat['id']; ?>"
+                      <?= ($kategori_selected == $kat['id']) ? 'selected' : ''; ?>>
+                      <?= htmlspecialchars($kat['nama']); ?>
+                  </option>
+              <?php endwhile; ?>
+
+          </select>
+
+      
           <?php $search = $_GET['search'] ?? ''; ?>
-          <input type="text" name="search" class="input-text" placeholder="Cari nama event..." value="<?= htmlspecialchars($search) ?>" style="max-width: 300px; margin: 0;">
+          <input type="text" name="search" class="input-text" placeholder="Cari nama event..." value="<?= htmlspecialchars($search) ?>" style="margin: 0;">
           <button type="submit" class="btn-submit" style="padding: 0.6rem 1.5rem; margin: 0; width: auto;">Cari</button>
           
-          <?php if (!empty($search)): ?>
+
+          <?php if (!empty($search) || !empty($kategori_selected)): ?>
             <a href="kelola_event.php" class="btn-sm btn-reject" style="text-decoration: none; padding: 0.6rem 1rem; line-height: 1.5;">Reset</a>
           <?php endif; ?>
         </form>
@@ -125,10 +151,15 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
 
               // Query dasar
               $query_sql = "SELECT * FROM events WHERE 1=1";
+              $kategori_selected = $_GET['kategori'] ?? '';
 
               // Jika input search diisi, tambahkan kondisi filter LIKE
               if ($search_keyword != '') {
                   $query_sql .= " AND name LIKE '%$search_keyword%'";
+              }
+
+              if ($kategori_selected != '') {
+                  $query_sql .= " AND category_id = '$kategori_selected'";
               }
 
               $query_sql .= " ORDER BY id DESC";
@@ -151,7 +182,11 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
                 <td><?php echo htmlspecialchars($nama_kategori); ?></td>
                 <td><span class="status-badge <?php echo strtolower($row['status']); ?>"><?php echo $row['status']; ?></span></td>
                 <td>
-                  <a href="proses_hapus_event.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin hapus?');" class="btn-sm btn-reject">Hapus</a>
+                    <!-- <a href="proses_hapus_event.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin hapus?');" class="btn-sm btn-reject">Hapus</a> -->
+                    <a href="proses_persetujuan_event.php?action=reject&id=<?php echo $row['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
+                    <a href="proses_persetujuan_event.php?action=approve&id=<?php echo $row['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
+                    <a href="event_detail.php?id=<?php echo $row['id']; ?>" class="btn-detail" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 1rem;">Detail-></a>
+                    
                 </td>
               </tr>
               <?php 

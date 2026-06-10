@@ -12,7 +12,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     $action = $_GET['action'];
     $id = (int)$_GET['id'];
     
-    $status = ($action === 'approve') ? 'Approved' : (($action === 'reject') ? 'Rejected' : null);
+    $status = ($action === 'approve') ? 'approve' : (($action === 'reject') ? 'reject' : null);
     
     if ($status) {
         // Fetch event name first for toast message
@@ -30,13 +30,13 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $stmt = mysqli_prepare($koneksi, "UPDATE events SET status = ? WHERE id = ?");
         mysqli_stmt_bind_param($stmt, "si", $status, $id);
         if (mysqli_stmt_execute($stmt)) {
-            $_SESSION['toast_msg'] = "Event '" . $event_name . "' " . ($status === 'Approved' ? 'berhasil disetujui!' : 'telah ditolak.');
+            $_SESSION['toast_msg'] = "Event '" . $event_name . "' " . ($status === 'approve' ? 'berhasil disetujui!' : 'telah ditolak.');
             $_SESSION['toast_type'] = ($status === 'Approved') ? 'success' : 'info';
         }
         mysqli_stmt_close($stmt);
     }
 }
 
-header("Location: dashboard.php");
+header("Location: " . $_SERVER['HTTP_REFERER']);
 exit();
 ?>
