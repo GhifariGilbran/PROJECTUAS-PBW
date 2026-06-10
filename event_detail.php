@@ -268,7 +268,7 @@ if (isset($_SESSION['toast_msg'])) {
                   </div>
                   <div class="input-group">
                     <span class="detail-meta-label">Status</span>
-                    <?php $select = ['pending', 'approve', 'reject']; ?>
+                    <?php $select = ['pending', 'approve', 'reject', 'selesai']; ?>
                     <select id="status" name="status" class="input-text" required>
                       
                       <?php foreach($select as $status): ?>
