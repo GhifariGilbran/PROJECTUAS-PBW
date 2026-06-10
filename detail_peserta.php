@@ -2,7 +2,7 @@
 session_start();
 include 'koneksi.php';
 
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'panitia') {
     header("Location: dashboard.php");
     exit();
 }
@@ -15,6 +15,8 @@ if (!$event_id) {
     header("Location: peserta.php");
     exit();
 }
+
+$status_filter = $_GET['status'] ?? '';
 
 // Ambil info event + kategori
 $q_event = mysqli_query($koneksi, "
@@ -29,15 +31,22 @@ if (!$event) {
     exit();
 }
 
-// Ambil semua peserta yang terdaftar di event ini
-$q_peserta = mysqli_query($koneksi, "
+$query_peserta = "
     SELECT u.nama_lengkap, u.nim, u.prodi, u.no_hp, u.angkatan,
            r.waktu_daftar, r.waktu_hadir, r.status, r.kode_unik
     FROM registration r
     JOIN users u ON r.peserta_id = u.id
     WHERE r.event_id = $event_id
-    ORDER BY r.waktu_daftar ASC
-");
+";
+
+if ($status_filter != '') {
+    $status_filter = mysqli_real_escape_string($koneksi, $status_filter);
+    $query_peserta .= " AND r.status = '$status_filter'";
+}
+
+$query_peserta .= " ORDER BY r.waktu_daftar ASC";
+
+$q_peserta = mysqli_query($koneksi, $query_peserta);
 
 $total_semua   = mysqli_num_rows($q_peserta);
 
@@ -75,6 +84,7 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
   <div class="app-container">
 
     <aside id="sidebar">
+      <?php if($role === 'admin'): ?>
       <div class="menu-group">
         <span class="menu-title">Menu Utama</span>
         <ul class="menu-items">
@@ -119,18 +129,67 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
           </li>
         </ul>
       </div>
+
+       <?php elseif ($role === 'panitia'): ?>
+        <div class="menu-group">
+          <span class="menu-title">Menu Utama</span>
+          <ul class="menu-items">
+            <li>
+              <a href="dashboard.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="tambah_event.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                Buat Event
+              </a>
+            </li>
+            <li>
+              <a href="event_saya_panitia.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                Event Saya
+              </a>
+            </li>
+            <li>
+              <a href="peserta_panitia.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                Peserta
+              </a>
+            </li>
+            <li>
+              <a href="peserta_panitia.php" class="menu-link" style="color: aqua; margin-left: 20%;">
+                | Peserta
+              </a>
+            </li>
+            <li>
+              <a href="sertifikat.php" class="menu-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Sertifikat
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      
+      <?php endif; ?>
+
+
     </aside>
 
     <main>
       <section class="view-section active">
 
         <!-- Header + tombol kembali -->
+         <?php if($role === 'admin'): ?>
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
           <a href="peserta.php" style="color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem;">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Kembali
           </a>
         </div>
+        <?php endif; ?>
 
         <div class="view-header" style="flex-direction: column; align-items: flex-start; gap: 0.25rem; margin-bottom: 1.5rem;">
           <h2 class="view-title"><?php echo htmlspecialchars($event['name']); ?></h2>
@@ -159,7 +218,38 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
             <span class="stat-sublabel">waktu_hadir kosong</span>
           </div>
         </div>
+          <form method="GET" style="margin-bottom: 1rem; display:flex; gap:10px; align-items:center;">
+    
+              <input type="hidden" name="id" value="<?= $event_id ?>">
 
+              <select name="status" class="input-text" onchange="this.form.submit()" style="max-width:220px;">
+                  <option value="">Semua Status</option>
+
+                  <option value="hadir"
+                      <?= ($status_filter == 'hadir') ? 'selected' : '' ?>>
+                      Hadir
+                  </option>
+
+                  <option value="tidak_hadir"
+                      <?= ($status_filter == 'tidak_hadir') ? 'selected' : '' ?>>
+                      Tidak Hadir
+                  </option>
+
+                  <option value="terdaftar"
+                      <?= ($status_filter == 'terdaftar') ? 'selected' : '' ?>>
+                      Terdaftar
+                  </option>
+              </select>
+
+              <?php if($status_filter != ''): ?>
+                  <a href="detail_peserta.php?id=<?= $event_id ?>"
+                    class="btn-sm btn-reject"
+                    style="text-decoration:none;">
+                    Reset
+                  </a>
+              <?php endif; ?>
+
+          </form>
         <!-- Tabel peserta -->
         <div class="table-container">
           <table>

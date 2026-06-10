@@ -328,7 +328,7 @@ if (isset($_SESSION['toast_msg'])) {
               </thead>
               <tbody>
                 <?php 
-                // 1. QUERY YANG BENAR: Gabungkan events dan users untuk mencari prodi, khusus status pending
+                // 1. QUERY Gabungkan events dan users untuk mencari prodi, khusus status pending
                 $query_pending = "SELECT events.*, users.prodi 
                                   FROM events 
                                   LEFT JOIN users ON events.panitia_id = users.id 
@@ -337,11 +337,11 @@ if (isset($_SESSION['toast_msg'])) {
                 $pending_events_res = mysqli_query($koneksi, $query_pending);
                 $has_pending = false;
 
-                // 2. MULAI PERULANGAN DATA
+                // PERULANGAN DATA
                 while ($event = mysqli_fetch_assoc($pending_events_res)):
                     $has_pending = true;
                     
-                    // Format nama prodi agar rapi langsung di dalam loop PHP
+                    // Format nama prodi langsung di dalam loop
                     $prodi_tampil = !empty($event['prodi']) ? ucwords(str_replace('_', ' ', $event['prodi'])) : 'Umum / Tanpa Prodi';
                     
                     // Format tanggal cadangan jika kolom tgl_mulai kosong
@@ -479,7 +479,7 @@ if (isset($_SESSION['toast_msg'])) {
                 Aksi Cepat
               </div>
               <div class="quick-action-container" style="border-radius: 0 0 12px 12px; border-top: none;">
-                <a href="buat_event.php" class="quick-action-card">
+                <a href="tambah_event.php" class="quick-action-card">
                     <div class="quick-action-text">
                         <h4>Buat Event Baru</h4>
                         <p>Buat Event Untuk di Tinjau Admin</p>

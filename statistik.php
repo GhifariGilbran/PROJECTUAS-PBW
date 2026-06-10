@@ -11,19 +11,7 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
 $role = $_SESSION['user_role'];
 $username = $_SESSION['username'];
 
-// Handle Delete User
-if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    $stmt = mysqli_prepare($koneksi, "DELETE FROM users WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    if (mysqli_stmt_execute($stmt)) {
-        $_SESSION['toast_msg'] = "Pengguna berhasil dihapus!";
-        $_SESSION['toast_type'] = "success";
-    }
-    mysqli_stmt_close($stmt);
-    header("Location: kelola_pengguna.php");
-    exit();
-}
+
 
 $toast_msg = "";
 $toast_type = "";
@@ -260,7 +248,7 @@ if (isset($_SESSION['toast_msg'])) {
                 datasets: [{
                     label: 'Jumlah Pendaftar',
                     data: <?= json_encode($registrasiData); ?>,
-                    tension: 0.4,
+                    tension: 0.2,
                     fill: false
                 }]
             },

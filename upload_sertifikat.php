@@ -11,6 +11,8 @@ $role         = $_SESSION['user_role'];
 $username     = $_SESSION['username'] ?? 'Panitia';
 $user_id      = $_SESSION['user_id'];
 
+$id_event = $_GET['id'];
+
 $search_query = "";
 $peserta_list = [];
 $event_nama   = "";
@@ -145,7 +147,7 @@ function fmt_date($dt) {
             </a>
           </li>
           <li>
-            <a href="peserta_panitia.php" class="menu-link active">
+            <a href="peserta_panitia.php" class="menu-link">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
               Peserta
             </a>
@@ -156,6 +158,11 @@ function fmt_date($dt) {
               Sertifikat
             </a>
           </li>
+          <li>
+            <a href="sertifikat.php" class="menu-link" style="color: aqua; margin-left: 20%;">
+              | Upload Sertifikat
+            </a>
+          </li>
         </ul>
       </div>
     </aside>
@@ -163,117 +170,51 @@ function fmt_date($dt) {
     <main>
       <section class="view-section active">
           <div class="view-header" style="flex-direction: column; align-items: flex-start; gap: 0.25rem; margin-bottom: 1.5rem;">
-            <h2 class="view-title">Kelola Peserta</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Lihat Daftar Dan Kehadiran Peserta per Event</p>
+            <h2 class="view-title">Upload Sertifikat</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Uplaod sertifikat untuk peserta</p>
           </div>
-
-          <form method="GET" action="peserta_panitia.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
-            <?php 
-            $pilihanakun = $_GET['kategori'] ?? ''; 
-            $search = $_GET['search'] ?? ''; 
-            ?>
-
-            <?php
-            $kategori_res = mysqli_query($koneksi, "SELECT * FROM categories ORDER BY nama ASC");
-            $kategori_selected = $_GET['kategori'] ?? '';
-            $search = $_GET['search'] ?? '';
-          ?>
-
             
-            <select name="kategori" class="input-text" onchange="this.form.submit()" style="max-width: 300px;">
-                <option value="">Semua Kategori</option>
+        <p style="color: aqua;">Perlu Diperhatikan !</p>
+    
+        <ul style="list-style: none; color: var(--text-muted);">
+            <li>1. Pastikan anda membuat sertifikat hanya untuk peserta yang hadir. <a href="peserta_panitia.php" style="color: aqua;">Lihat Kehadiran Peserta</a></li>
+            <li>2. Upload semua sertifikat ke dalam folder Google Drive.</li>
+            <li>3. Pastikan folder Google Drive yang anda buat bersifat publik (Tidak di private).</li>
+            <li>4. Salin link folder Google Drive anda, lalu sisipkan link tersebut kesini :</li>
+        </ul>
+        <br>
+        <?php
 
-                <?php while($kat = mysqli_fetch_assoc($kategori_res)): ?>
-                    <option value="<?= $kat['id']; ?>"
-                        <?= ($kategori_selected == $kat['id']) ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($kat['nama']); ?>
-                    </option>
-                <?php endwhile; ?>
+            $data = null;
 
-            </select>
+            if(isset($_GET['id']) && $_GET['id'] != ''){
 
-        
-            <?php $search = $_GET['search'] ?? ''; ?>
-            <input type="text" name="search" class="input-text" placeholder="Cari nama event..." value="<?= htmlspecialchars($search) ?>" style="margin: 0;">
-            <button type="submit" class="btn-submit" style="padding: 0.6rem 1.5rem; margin: 0; width: auto;">Cari</button>
-            
+                $event_id = (int)$_GET['id'];
 
-            <?php if (!empty($search) || !empty($kategori_selected)): ?>
-              <a href="peserta_panitia.php" class="btn-sm btn-reject" style="text-decoration: none; padding: 0.6rem 1rem; line-height: 1.5;">Reset</a>
-            <?php endif; ?>
-          </form>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Pilih event untuk melihat peserta pada event yang anda buat.</p> <br>
+                $query = mysqli_query($koneksi,"
+                    SELECT c.file_path
+                    FROM certificate c
+                    JOIN registration r ON c.registration_id = r.id
+                    WHERE r.event_id = $event_id
+                    LIMIT 1
+                ");
 
-          <div class="table-container">
-            <table>
-              <thead>              
-                <tr>
-                  <th>No</th>
-                  <th>Nama Event</th>
-                  <th>Kategori</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
+                if(mysqli_num_rows($query) > 0){
+                    $data = mysqli_fetch_assoc($query);
+                }
+            }
 
-                <tbody>
+        ?>
+        <form action="proses_upload_sertifikat.php" method="post">
+             <input type="hidden" name="event_id" value="<?= $id_event ?>">
+            <div class="form-row-2">
+                <input type="text" name="link_drive" class="input-text" value="<?= htmlspecialchars($data['file_path'] ?? '') ?>" required >
+                <div>
+                    <button type="submit" class="btn-submit" style="padding: 0.6rem 1.5rem; margin: 0; width: auto;">Kirim</button>
+                </div>
+            </div>
 
-                <?php
-                  // Menangkap keyword pencarian dan mengamankannya dari SQL Injection
-                  $search_keyword = isset($_GET['search']) ? mysqli_real_escape_string($koneksi, trim($_GET['search'])) : '';
-
-                  // Query dasar
-                  $query_sql = "SELECT * FROM events WHERE panitia_id = $user_id AND status IN ('approve','selesai')";
-                  $kategori_selected = $_GET['kategori'] ?? '';
-
-                  // Jika input search diisi, tambahkan kondisi filter LIKE
-                  if ($search_keyword != '') {
-                      $query_sql .= " AND name LIKE '%$search_keyword%'";
-                  }
-
-                  if ($kategori_selected != '') {
-                      $query_sql .= " AND category_id = '$kategori_selected'";
-                  }
-
-                  $query_sql .= " ORDER BY id DESC";
-                  $res = mysqli_query($koneksi, $query_sql);
-                  $no = 1;
-
-                  if (mysqli_num_rows($res) > 0) {
-                      while($row = mysqli_fetch_assoc($res)):
-                      $kategori_id = $row['category_id'];
-                      
-                      $kategori_query = mysqli_query($koneksi, "SELECT * FROM categories WHERE id = $kategori_id");
-                      $kategori = mysqli_fetch_assoc($kategori_query);
-                      
-                      // Mengamankan data kategori jika ada id kategori yang tidak valid/dihapus
-                      $nama_kategori = $kategori ? $kategori['nama'] : 'Tanpa Kategori';
-                  ?>
-                      <tr>
-                    <td><?php echo $no++; ?></td>
-                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                    <td><?php echo htmlspecialchars($nama_kategori); ?></td>
-                    <td><span class="status-badge <?php echo strtolower($row['status']); ?>"><?php echo $row['status']; ?></span></td>
-                    <td>
-                        <!-- <a href="proses_hapus_event.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin hapus?');" class="btn-sm btn-reject">Hapus</a> -->
-                        <a href="detail_peserta.php?id=<?php echo $row['id']; ?>" class="btn-detail" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 1rem;">Lihat Peserta</a>
-                        
-                    </td>
-                  </tr>
-                  <?php 
-                      endwhile;
-                  } else {      
-
-                  ?>
-                  <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Event tidak ditemukan.</td>
-                  </tr>
-                  <?php } ?>
-
-                </tbody>
-              </thead>
-            </table>
-          </div>
-
+        </form>
         </section>
     </main>
 

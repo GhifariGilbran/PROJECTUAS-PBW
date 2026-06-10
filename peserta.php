@@ -59,13 +59,7 @@ $selected_event_id = isset($_GET['event_id']) ? (int)$_GET['event_id'] : 0;
           <span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>        
           <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
         </div>
-        <!-- Circular Avatar Icon to match image -->
-        <div class="avatar-container" style="color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        </div>
+        
         <a href="logout.php" class="logout-btn-header">Keluar</a>
       </div>
     </header>
@@ -267,14 +261,6 @@ $selected_event_id = isset($_GET['event_id']) ? (int)$_GET['event_id'] : 0;
               </thead>
             </table>
           </div>
-            
-
-          
-
-
-          
-      
-        
 
         </section>
       </main>

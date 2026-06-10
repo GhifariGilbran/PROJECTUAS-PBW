@@ -93,9 +93,9 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
         $stats = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total, SUM(status='Pending') as pending, SUM(status='approve') as approve FROM events"));
         ?>
         <div class="stats-grid" style="display: flex; gap: 1rem; margin-bottom: 2rem; color: black;">
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Total: <?php echo (int)$stats['total']; ?></h3></div>
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Pending: <?php echo (int)$stats['pending']; ?></h3></div>
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; flex: 1;"><h3>Disetujui: <?php echo (int)$stats['approve']; ?></h3></div>
+            <div class="stat-card" style="color: white;"><h3>Total: <?php echo (int)$stats['total']; ?></h3></div>
+            <div class="stat-card" style="color: white;"><h3>Pending: <?php echo (int)$stats['pending']; ?></h3></div>
+            <div class="stat-card" style="color: white;"><h3>Disetujui: <?php echo (int)$stats['approve']; ?></h3></div>
         </div>
 
         <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">

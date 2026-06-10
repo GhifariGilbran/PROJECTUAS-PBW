@@ -88,20 +88,41 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
         <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
             <h2 class="view-title">Event yang anda buat</h2>
-            
           </div>
-            <a href="tambah_event.php" class="btn-submit">+ Tambah Event</a>
         </div>
 
-        
+                <?php
+          $kategori_res = mysqli_query($koneksi, "SELECT * FROM categories ORDER BY nama ASC");
+          $kategori_selected = $_GET['kategori'] ?? '';
+          $search = $_GET['search'] ?? '';
+        ?>
 
-        <form method="GET" action="kelola_event.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+        <form method="GET" action="event_saya_panitia.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+          <?php 
+          $pilihanakun = $_GET['kategori'] ?? ''; 
+          $search = $_GET['search'] ?? ''; 
+          ?>
+
+          
+          <select name="kategori" class="input-text" onchange="this.form.submit()" style="max-width: 300px;">
+              <option value="">Semua Kategori</option>
+
+              <?php while($kat = mysqli_fetch_assoc($kategori_res)): ?>
+                  <option value="<?= $kat['id']; ?>"
+                      <?= ($kategori_selected == $kat['id']) ? 'selected' : ''; ?>>
+                      <?= htmlspecialchars($kat['nama']); ?>
+                  </option>
+              <?php endwhile; ?>
+
+          </select>
+
+        <form method="GET" action="event_saya_panitia.php" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
           <?php $search = $_GET['search'] ?? ''; ?>
           <input type="text" name="search" class="input-text" placeholder="Cari nama event..." value="<?= htmlspecialchars($search) ?>" style="max-width: 300px; margin: 0;">
           <button type="submit" class="btn-submit" style="padding: 0.6rem 1.5rem; margin: 0; width: auto;">Cari</button>
           
           <?php if (!empty($search)): ?>
-            <a href="kelola_event.php" class="btn-sm btn-reject" style="text-decoration: none; padding: 0.6rem 1rem; line-height: 1.5;">Reset</a>
+            <a href="event_saya_panitia.php" class="btn-sm btn-reject" style="text-decoration: none; padding: 0.6rem 1rem; line-height: 1.5;">Reset</a>
           <?php endif; ?>
         </form>
 
@@ -117,10 +138,15 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
 
               // Query dasar
               $query_sql = "SELECT * FROM events WHERE panitia_id = $id";
+              $kategori_selected = $_GET['kategori'] ?? '';
 
               // Jika input search diisi, tambahkan kondisi filter LIKE
               if ($search_keyword != '') {
                   $query_sql .= " AND name LIKE '%$search_keyword%'";
+              }
+
+              if ($kategori_selected != '') {
+                  $query_sql .= " AND category_id = '$kategori_selected'";
               }
 
               $query_sql .= " ORDER BY id DESC";

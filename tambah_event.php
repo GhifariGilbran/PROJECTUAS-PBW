@@ -58,7 +58,7 @@ unset($_SESSION['tambah_event_error']);
               </a>
             </li>
             <li>
-              <a href="kelola_event.php" class="menu-link active">
+              <a href="kelola_event.php" class="menu-link">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 Kelola Event
               </a>
@@ -143,10 +143,12 @@ unset($_SESSION['tambah_event_error']);
 
     <!-- Main Content Area -->
     <main>
+      <?php if($role === 'admin'): ?>
       <a href="kelola_event.php" class="btn-back-link">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         Kembali ke Kelola Event
       </a>
+      <?php endif; ?>
 
       <div class="view-header">
         <h2 class="view-title">Tambah Event Baru</h2>
