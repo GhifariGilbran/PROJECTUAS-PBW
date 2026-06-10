@@ -200,7 +200,7 @@ if (isset($_SESSION['toast_msg'])) {
               </a>
             </li>
             <li>
-              <a href="event_saya.php" class="menu-link">
+              <a href="event_saya_panitia.php" class="menu-link">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                 Event Saya
               </a>
@@ -354,11 +354,10 @@ if (isset($_SESSION['toast_msg'])) {
                     <td><?php echo htmlspecialchars($event['created_at']); ?></td>
                     <td><span class="status-badge pending">Pending</span></td>
                     <td class="actions-cell">
-  <a href="dashboard.php?action=reject&id=<?php echo $event['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
-  <a href="dashboard.php?action=approve&id=<?php echo $event['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
-  <a href="lihat_peserta.php?event_id=<?php echo $event['id']; ?>" class="btn-sm" style="display:inline-flex; align-items:center; text-decoration:none; background-color:#1a3a4a; color:#5ce1e6; border:1px solid #5ce1e6;">Lihat Peserta</a>
-
-  <button class="btn-detail" onclick="viewEventDetails(
+                      <a href="dashboard.php?action=reject&id=<?php echo $event['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
+                      <a href="dashboard.php?action=approve&id=<?php echo $event['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
+                      
+                      <button class="btn-detail" onclick="viewEventDetails(
                           `<?php echo htmlspecialchars($event['name'], ENT_QUOTES, 'UTF-8'); ?>`, 
                           `<?php echo $prodi_tampil; ?>`, 
                           `<?php echo $event['quota']; ?>`, 

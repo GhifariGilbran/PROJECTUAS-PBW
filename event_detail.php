@@ -110,7 +110,7 @@ if (isset($_SESSION['toast_msg'])) {
         <span class="user-info-text"><?php echo htmlspecialchars($username); ?></span>
         <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
       </div>
-      <a href="logout.php" class="logout-btn-header">Keluar</a>
+      <a href="logout.php" class="logout-btn-header">Kuar</a>
     </div>
   </header>
 
