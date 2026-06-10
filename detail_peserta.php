@@ -1,0 +1,225 @@
+<?php
+session_start();
+include 'koneksi.php';
+
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+    header("Location: dashboard.php");
+    exit();
+}
+
+$role     = $_SESSION['user_role'];
+$username = $_SESSION['username'];
+
+$event_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if (!$event_id) {
+    header("Location: peserta.php");
+    exit();
+}
+
+// Ambil info event + kategori
+$q_event = mysqli_query($koneksi, "
+    SELECT e.name, e.status, e.quota, c.nama AS kategori
+    FROM events e
+    LEFT JOIN categories c ON e.category_id = c.id
+    WHERE e.id = $event_id
+");
+$event = mysqli_fetch_assoc($q_event);
+if (!$event) {
+    header("Location: peserta.php");
+    exit();
+}
+
+// Ambil semua peserta yang terdaftar di event ini
+$q_peserta = mysqli_query($koneksi, "
+    SELECT u.nama_lengkap, u.nim, u.prodi, u.no_hp, u.angkatan,
+           r.waktu_daftar, r.waktu_hadir, r.status, r.kode_unik
+    FROM registration r
+    JOIN users u ON r.peserta_id = u.id
+    WHERE r.event_id = $event_id
+    ORDER BY r.waktu_daftar ASC
+");
+
+$total_semua   = mysqli_num_rows($q_peserta);
+
+// Hitung yang hadir
+$q_hadir = mysqli_query($koneksi, "
+    SELECT COUNT(*) as jumlah FROM registration 
+    WHERE event_id = $event_id AND waktu_hadir IS NOT NULL
+");
+$total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Peserta - UniVent</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <h1 class="logo-title">Uni<span>Vent</span></h1>
+      <span class="logo-subtitle">University Event</span>
+    </div>
+    <div class="header-right">
+      <div class="user-profile-meta">
+        <span class="user-info-text"><?php echo htmlspecialchars($username); ?></span>
+        <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
+      </div>
+      <a href="logout.php" class="logout-btn-header">Keluar</a>
+    </div>
+  </header>
+
+  <div class="app-container">
+
+    <aside id="sidebar">
+      <div class="menu-group">
+        <span class="menu-title">Menu Utama</span>
+        <ul class="menu-items">
+          <li>
+            <a href="dashboard.php" class="menu-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="kelola_event.php" class="menu-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Kelola Event
+            </a>
+          </li>
+          <li>
+            <a href="kelola_pengguna.php" class="menu-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              Kelola Pengguna
+            </a>
+          </li>
+          <li>
+            <a href="peserta.php" class="menu-link active">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              Peserta
+            </a>
+          </li>
+          <li>
+            <a href="kategori.php" class="menu-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              Kategori
+            </a>
+          </li>
+        </ul>
+        <span class="menu-title" style="margin-top: 1rem;">Laporan</span>
+        <ul class="menu-items">
+          <li>
+            <a href="statistik.php" class="menu-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              Statistik
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <main>
+      <section class="view-section active">
+
+        <!-- Header + tombol kembali -->
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+          <a href="peserta.php" style="color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Kembali
+          </a>
+        </div>
+
+        <div class="view-header" style="flex-direction: column; align-items: flex-start; gap: 0.25rem; margin-bottom: 1.5rem;">
+          <h2 class="view-title"><?php echo htmlspecialchars($event['name']); ?></h2>
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <span class="status-badge <?php echo strtolower($event['status']); ?>"><?php echo htmlspecialchars($event['status']); ?></span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Kategori: <strong style="color: var(--text-main);"><?php echo htmlspecialchars($event['kategori'] ?? 'Tanpa Kategori'); ?></strong></span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Kuota: <strong style="color: var(--text-main);"><?php echo htmlspecialchars($event['quota']); ?></strong></span>
+          </div>
+        </div>
+
+        <!-- Stat ringkas -->
+        <div class="stats-grid" style="margin-bottom: 1.5rem; grid-template-columns: repeat(3, 1fr);">
+          <div class="stat-card">
+            <span class="stat-label">Total Pendaftar</span>
+            <span class="stat-value"><?php echo $total_semua; ?></span>
+            <span class="stat-sublabel">Dari semua status</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Sudah Hadir</span>
+            <span class="stat-value" style="color: var(--color-success);"><?php echo $total_hadir; ?></span>
+            <span class="stat-sublabel">waktu_hadir terisi</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Belum Hadir</span>
+            <span class="stat-value" style="color: var(--color-pending);"><?php echo $total_semua - $total_hadir; ?></span>
+            <span class="stat-sublabel">waktu_hadir kosong</span>
+          </div>
+        </div>
+
+        <!-- Tabel peserta -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Lengkap</th>
+                <th>NIM</th>
+                <th>Prodi</th>
+                <th>Angkatan</th>
+                <th>No. HP</th>
+                <th>Kode Unik</th>
+                <th>Waktu Daftar</th>
+                <th>Waktu Hadir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if ($total_semua > 0):
+                $no = 1;
+                while ($row = mysqli_fetch_assoc($q_peserta)): ?>
+              <tr>
+                <td><?php echo $no++; ?></td>
+                <td><?php echo htmlspecialchars($row['nama_lengkap'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($row['nim'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($row['prodi'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($row['angkatan'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($row['no_hp'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($row['kode_unik'] ?? '-'); ?></td>
+                <td><?php echo $row['waktu_daftar'] ? date('d/m/Y H:i', strtotime($row['waktu_daftar'])) : '-'; ?></td>
+                <td>
+                  <?php if ($row['waktu_hadir']): ?>
+                    <span style="color: var(--color-success); font-weight: 700;">
+                      <?php echo date('d/m/Y H:i', strtotime($row['waktu_hadir'])); ?>
+                    </span>
+                  <?php else: ?>
+                    <span style="color: var(--color-pending);">Belum Hadir</span>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <span class="status-badge <?php echo strtolower($row['status'] ?? ''); ?>">
+                    <?php echo ucfirst($row['status'] ?? '-'); ?>
+                  </span>
+                </td>
+              </tr>
+              <?php endwhile;
+              else: ?>
+              <tr>
+                <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                  Belum ada peserta yang mendaftar di event ini.
+                </td>
+              </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+</body>
+</html>

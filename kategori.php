@@ -50,7 +50,7 @@ if (isset($_SESSION['toast_msg'])) {
     </div>
     <div class="header-right">
       <div class="user-profile-meta">
-        <span class="user-info-text"><?php echo htmlspecialchars($username); ?></span>
+<span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>        
         <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
       </div>
       <a href="logout.php" class="logout-btn-header">Keluar</a>

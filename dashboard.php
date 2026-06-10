@@ -354,10 +354,11 @@ if (isset($_SESSION['toast_msg'])) {
                     <td><?php echo htmlspecialchars($event['created_at']); ?></td>
                     <td><span class="status-badge pending">Pending</span></td>
                     <td class="actions-cell">
-                      <a href="dashboard.php?action=reject&id=<?php echo $event['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
-                      <a href="dashboard.php?action=approve&id=<?php echo $event['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
-                      
-                      <button class="btn-detail" onclick="viewEventDetails(
+  <a href="dashboard.php?action=reject&id=<?php echo $event['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
+  <a href="dashboard.php?action=approve&id=<?php echo $event['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
+  <a href="lihat_peserta.php?event_id=<?php echo $event['id']; ?>" class="btn-sm" style="display:inline-flex; align-items:center; text-decoration:none; background-color:#1a3a4a; color:#5ce1e6; border:1px solid #5ce1e6;">Lihat Peserta</a>
+
+  <button class="btn-detail" onclick="viewEventDetails(
                           `<?php echo htmlspecialchars($event['name'], ENT_QUOTES, 'UTF-8'); ?>`, 
                           `<?php echo $prodi_tampil; ?>`, 
                           `<?php echo $event['quota']; ?>`, 

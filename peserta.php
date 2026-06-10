@@ -56,7 +56,7 @@ $selected_event_id = isset($_GET['event_id']) ? (int)$_GET['event_id'] : 0;
       
       <div class="header-right" style="gap: 1.5rem; align-items: center;">
         <div class="user-profile-meta">
-          <span class="user-info-text"><?php echo htmlspecialchars($username); ?></span>
+          <span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>        
           <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
         </div>
         <!-- Circular Avatar Icon to match image -->
