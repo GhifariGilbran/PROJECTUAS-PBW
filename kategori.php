@@ -137,14 +137,12 @@ if (isset($_SESSION['toast_msg'])) {
 
               <tr>
                 <td><?php echo $no++; ?></td>
-                <td><?php echo htmlspecialchars($ktgr['nama']); ?></td>
+                <td style="color:aqua;"><?php echo htmlspecialchars($ktgr['nama']); ?></td>
                 <td><?php echo htmlspecialchars($ktgr['deskripsi']); ?></td>
                 <td><?php echo htmlspecialchars($ktgr['updated_at']); ?></span></td>
                 <td class="actions-cell">              
-
-                    <a href="edit_pengguna.php?action=&id=<?php echo $ktgr['id']; ?>"  class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
-
-                  </td>
+                    <a href="detail_kategori.php?id=<?php echo $ktgr['id']; ?>"  class="btn-sm btn-approve" style="text-decoration:none;">Edit</a>
+                </td>
             </tr>
                         
             <?php endwhile;
