@@ -207,9 +207,7 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
     <span><?php echo htmlspecialchars($toast_msg); ?></span>
   </div>
   <script>
-    function showFeatureAlert(featureName) {
-      alert('Fitur "' + featureName + '" adalah mockup.');
-    }
+   
   </script>
 </body>
 </html>

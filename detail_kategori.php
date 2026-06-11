@@ -155,18 +155,21 @@ $kategori_id = (int)$_GET['id'];
         Kembali
       </a>
 
-      <div class="view-header">
-        <h2 class="view-title">Detail Kategori</h2>
-      </div>
-
-   
-
       <?php 
 
         $query = mysqli_query($koneksi, "SELECT * FROM categories WHERE id = $kategori_id");
         $kategori = mysqli_fetch_assoc($query);
 
       ?>
+
+        <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 class="view-title">Kelola Event</h2>
+          <a href="proses_hapus_kategori.php?id=<?= $kategori_id?>" class="btn-sm btn-reject" onclick="return confirm('Yakin ingin menghapus?');" style="display:inline-flex; align-items:center; text-decoration:none;">Hapus Kategori</a>
+        </div>
+
+   
+
+      
 
       <div class="form-card">
         <form action="proses_edit_kategori.php" method="POST">

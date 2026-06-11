@@ -259,9 +259,7 @@ unset($_SESSION['tambah_event_error']);
   </div>
 
   <script>
-    function showFeatureAlert(featureName) {
-      alert('Fitur "' + featureName + '" adalah mockup.');
-    }
+    
   </script>
 </body>
 </html>

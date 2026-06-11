@@ -266,6 +266,7 @@ if (isset($_SESSION['toast_msg'])) {
                     <span class="detail-meta-label">Biaya</span>
                     <input class="input-text" type="text" name="harga" value="<?php echo number_format($event['harga'], 0, ',', '.'); ?>" >
                   </div>
+                  
                   <div class="input-group">
                     <span class="detail-meta-label">Status</span>
                     <?php $select = ['pending', 'approve', 'reject', 'selesai']; ?>

@@ -41,6 +41,8 @@ if (isset($_SESSION['toast_msg'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelola Pengguna - UniVent</title>
   <link rel="stylesheet" href="style.css">
+  <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+
 </head>
 <body>
   <header>
@@ -107,12 +109,29 @@ if (isset($_SESSION['toast_msg'])) {
     </aside>
 
     <main>
-        <div class="view-header">
-          <h2 class="view-title">Kategori</h2>
+       
+
+        <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 class="view-title">Kategori</h2>
+
+          <a href="tambah_kategori.php" class="btn-submit">+ Tambah Kategori</a>
         </div>
 
         <span>Ini adalah kategori untuk event</span>
         
+        <?php if(isset($_SESSION['toast_msg'])): ?>
+            <script>
+            Swal.fire({
+                icon: '<?= $_SESSION['toast_type'] ?>',
+                title: '<?= $_SESSION['toast_type'] == "success" ? "Berhasil" : "Gagal" ?>',
+                text: '<?= $_SESSION['toast_msg'] ?>'
+            });
+            </script>
+            <?php
+            unset($_SESSION['toast_msg']);
+            unset($_SESSION['toast_type']);
+            endif;
+        ?>
   
 
         <div class="table-container">
@@ -171,9 +190,7 @@ if (isset($_SESSION['toast_msg'])) {
         toast.classList.remove('show');
       }, 3000);
     }
-    function showFeatureAlert(featureName) {
-      alert('Fitur "' + featureName + '" adalah mockup.');
-    }
+    
   </script>
 </body>
 </html>

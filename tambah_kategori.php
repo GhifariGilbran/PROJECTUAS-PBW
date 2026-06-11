@@ -41,6 +41,8 @@ if (isset($_SESSION['toast_msg'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelola Pengguna - UniVent</title>
   <link rel="stylesheet" href="style.css">
+  <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+
 </head>
 <body>
   <header>
@@ -50,7 +52,7 @@ if (isset($_SESSION['toast_msg'])) {
     </div>
     <div class="header-right">
       <div class="user-profile-meta">
-        <span class="user-info-text"><?php echo htmlspecialchars($username); ?></span>
+<span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>        
         <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
       </div>
       <a href="logout.php" class="logout-btn-header">Keluar</a>
@@ -81,11 +83,6 @@ if (isset($_SESSION['toast_msg'])) {
               </a>
             </li>
             <li>
-              <a href="kelola_pengguna.php" class="menu-link" style="color:aqua; margin-left: 20%;">
-                | Edit Pengguna
-              </a>
-            </li>
-            <li>
               <a href="peserta.php" class="menu-link">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 Peserta
@@ -97,12 +94,18 @@ if (isset($_SESSION['toast_msg'])) {
                 Kategori
               </a>
             </li>
+
+            <li>
+              <a href="kategori.php" class="menu-link" style="color:aqua; margin-left: 20%;">
+                | Tambah Kategori
+              </a>
+            </li>
           </ul>
 
           <span class="menu-title" style="margin-top: 1rem;">Laporan</span>
           <ul class="menu-items">
             <li>
-              <a href="#" class="menu-link" onclick="showFeatureAlert('Statistik')">
+              <a href="statistik.php" class="menu-link" >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 Statistik
               </a>
@@ -112,83 +115,50 @@ if (isset($_SESSION['toast_msg'])) {
     </aside>
 
     <main>
+       
+        <a href="Kategori.php" class="btn-back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Kembali
+        </a>
         <div class="view-header">
-          <h2 class="view-title">Edit Pengguna Ini</h2>
+                    <h2 class="view-title">Kategori</h2>
+
         </div>
+
+        <span>Tambah Kategori Baru Untuk Event Selanjutnya</span>
         
-        <?php
-        $id_pengguna = $_GET['id'];
-        $data_user = mysqli_query($koneksi, "SELECT * FROM users WHERE id = $id_pengguna");
-        $u = mysqli_fetch_assoc($data_user);
+        <br><br>
+        <?php if(isset($_SESSION['toast_msg'])): ?>
+            <script>
+            Swal.fire({
+                icon: '<?= $_SESSION['toast_type'] ?>',
+                title: '<?= $_SESSION['toast_type'] == "success" ? "Berhasil" : "Gagal" ?>',
+                text: '<?= $_SESSION['toast_msg'] ?>'
+            });
+            </script>
+            <?php
+            unset($_SESSION['toast_msg']);
+            unset($_SESSION['toast_type']);
+            endif;
         ?>
 
-      <form action="proses_update_pengguna.php" method="post">
-        <input type="hidden" name="id" value="<?= $id_pengguna ?>">
-        <input type="hidden" name="role" value="<?= $u['role'] ?>">
-        
-        <div class="form-row-2">
-          
-          <div class="form-group">
-            <h3>Username</h3>
-            <input name="username" class="input-text" type="text" value="<?= htmlspecialchars($u['username']) ?>">
-          </div>
-
-          <div class="form-group">
-            <h3>Password</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted);">Kosongkan jika tidak ingin mengubah password</p>
-            <input name="password" class="input-text" type="password" placeholder="Masukkan password baru">
-          </div>
-
-          <?php if ($u['role'] === 'peserta'): ?>
+        <form action="proses_tambah_kategori.php" method="post">
             <div class="form-group">
-              <h3>NIM / ID Peserta</h3>
-              <input name="nim" class="input-text" type="text" value="<?= htmlspecialchars($u['nim'] ?? '') ?>">
+                <label class="form-label" for="nama">Nama Kategori</label>
+                <input type="text" name="nama" id="nama" class="input-text" placeholder="Nama kategori baru">
             </div>
+
+            <br>
 
             <div class="form-group">
-              <h3>Nama Lengkap</h3>
-              <input name="nama_lengkap" class="input-text" type="text" value="<?= htmlspecialchars($u['nama_lengkap'] ?? '') ?>">
+                <label class="form-label" for="deskripsi">deskripsi</label>
+                <textarea name="deskripsi" id="deskripsi" class="input-text" placeholder="Masukkan deskripsi dari kategori yang ingin anda buat.."></textarea>
             </div>
 
-            <div class="form-group">
-              <h3>Email</h3>
-              <input name="email" class="input-text" type="email" value="<?= htmlspecialchars($u['email'] ?? '') ?>">
-            </div>
-          <?php endif; ?>
+            <br>
 
-          <?php if ($u['role'] === 'panitia' || $u['role'] === 'peserta'): ?>
-            <div class="input-group">
-                    <h3>Prodi</h3>
-                    <?php $select = ['informatika', 'sistem_informasi']?>
-                    <select id="prodi" name="prodi" class="input-text" required>
-                      
-                      <?php foreach($select as $prodi): ?>
-                          <option value="<?= $prodi ?>" <?= ($u['prodi'] == $prodi) ? 'selected' : '' ?>>
-                <?= ucfirst(str_replace('_', ' ', $prodi)) ?>
-            </option>
-                      <?php endforeach; ?>       
-
-                    </select>
-            </div>
-          <?php endif; ?>
-
-          <?php if ($u['role'] === 'peserta'): ?>
-            <div class="form-group">
-              <h3>Angkatan</h3>
-              <input name="angkatan" class="input-text" type="text" value="<?= htmlspecialchars($u['angkatan'] ?? '') ?>">
-            </div>
-
-            <div class="form-group">
-              <h3>No. HP</h3>
-              <input name="no_hp" class="input-text" type="text" value="<?= htmlspecialchars($u['no_hp'] ?? '') ?>">
-            </div>
-          <?php endif; ?>
-
-        </div>
-
-        <button type="submit" class="btn-submit" style="margin-top: 1.5rem;">Simpan Perubahan</button>
-      </form>
-
+            <button type="submit" class="btn-submit">Simpan</button>
+        </form>
       
     </main>
 
@@ -199,15 +169,7 @@ if (isset($_SESSION['toast_msg'])) {
   </div>
 
   <script>
-    const toast = document.getElementById('toast');
-    if (toast.classList.contains('show')) {
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-    function showFeatureAlert(featureName) {
-      alert('Fitur "' + featureName + '" adalah mockup.');
-    }
+   
   </script>
 </body>
 </html>
