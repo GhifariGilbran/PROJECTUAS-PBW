@@ -130,6 +130,17 @@ $my_events_res = mysqli_stmt_get_result($my_events_stmt);
         </a>
       </li>
     </ul>
+
+    <span class="menu-title" style="margin-top:1rem;">Manajemen Pembayaran</span>
+    <ul class="menu-items">
+      <li>
+        <a href="pembayaran_peserta.php" class="menu-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>          
+          Pembayaran Event
+        </a>
+      </li>
+    </ul>
+
     <span class="menu-title" style="margin-top:1rem;">Pengaturan</span>
     <ul class="menu-items">
       <li>
@@ -241,7 +252,8 @@ $my_events_res = mysqli_stmt_get_result($my_events_stmt);
                   $badge_label = match($reg_status) {
                       'hadir'       => 'Hadir',
                       'tidak_hadir' => 'Tidak Hadir',
-                      default       => 'Terdaftar',
+                      'pending_payment' => 'Belum Bayar',
+                      default       => 'Terdaftar'
                   };
                 ?>
                   <tr>
@@ -252,7 +264,7 @@ $my_events_res = mysqli_stmt_get_result($my_events_stmt);
                     <td><span class="kode-unik"><?php echo htmlspecialchars($ev['kode_unik']); ?></span></td>
                     <td><span class="reg-badge <?php echo htmlspecialchars($reg_status); ?>"><?php echo $badge_label; ?></span></td>
                     <td>
-                      <a href="event_detail.php?id=<?php echo $ev['id']; ?>" class="btn-edit-sm">Edit</a>
+                      <a href="event_detail.php?id=<?php echo $ev['id']; ?>" class="btn-edit-sm">Detail</a>
                     </td>
                   </tr>
                 <?php

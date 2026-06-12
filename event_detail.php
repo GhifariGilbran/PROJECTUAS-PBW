@@ -48,33 +48,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_event'])) {
         mysqli_begin_transaction($koneksi);
         
         try {
-            // Generate kode unik
             $kode_unik = strtoupper(uniqid('EVT-'));
-
-            // Insert registration record
-            $ins_stmt = mysqli_prepare($koneksi, "INSERT INTO registration (peserta_id, event_id, kode_unik) VALUES (?, ?, ?)");
-            mysqli_stmt_bind_param($ins_stmt, "iis", $user_id, $event_id, $kode_unik);
-            mysqli_stmt_execute($ins_stmt);
-            mysqli_stmt_close($ins_stmt);
+            $is_berbayar = $event['harga'] > 0;
             
-            // Decrement quota
+            // Status awal tergantung apakah event berbayar atau tidak
+            $status_awal = $is_berbayar ? 'pending_payment' : 'terdaftar';
+
+            // Insert registration
+            $ins_stmt = mysqli_prepare($koneksi, "INSERT INTO registration (peserta_id, event_id, kode_unik, status) VALUES (?, ?, ?, ?)");
+            mysqli_stmt_bind_param($ins_stmt, "iiss", $user_id, $event_id, $kode_unik, $status_awal);
+            mysqli_stmt_execute($ins_stmt);
+            $registration_id = mysqli_insert_id($koneksi);
+            mysqli_stmt_close($ins_stmt);
+
+            // Kalau berbayar, buat record payment
+            if ($is_berbayar) {
+                $pay_stmt = mysqli_prepare($koneksi, "INSERT INTO payment (registration_id, nominal, status_pembayaran) VALUES (?, ?, 'pending')");
+                mysqli_stmt_bind_param($pay_stmt, "id", $registration_id, $event['harga']);
+                mysqli_stmt_execute($pay_stmt);
+                mysqli_stmt_close($pay_stmt);
+            }
+
+            // Kurangi quota
             $upd_stmt = mysqli_prepare($koneksi, "UPDATE events SET quota = quota - 1 WHERE id = ? AND quota > 0");
             mysqli_stmt_bind_param($upd_stmt, "i", $event_id);
             mysqli_stmt_execute($upd_stmt);
             mysqli_stmt_close($upd_stmt);
             
             mysqli_commit($koneksi);
-            
-            $_SESSION['toast_msg'] = "Pendaftaran Berhasil! Anda terdaftar pada event '" . $event['name'] . "'";
-            $_SESSION['toast_type'] = 'success';
+
+            if ($is_berbayar) {
+                $_SESSION['toast_msg'] = "Pendaftaran berhasil! Silakan upload bukti pembayaran.";
+                $_SESSION['toast_type'] = 'info';
+                // Redirect ke halaman upload bukti
+                header("Location: upload_bukti.php?registration_id=" . $registration_id);
+            } else {
+                $_SESSION['toast_msg'] = "Pendaftaran Berhasil! Anda terdaftar pada event '" . $event['name'] . "'";
+                $_SESSION['toast_type'] = 'success';
+                header("Location: event_detail.php?id=" . $event_id);
+            }
+            exit();
+
         } catch (Exception $e) {
             mysqli_rollback($koneksi);
             $_SESSION['toast_msg'] = "Pendaftaran gagal! Silakan coba lagi.";
             $_SESSION['toast_type'] = 'info';
+            header("Location: event_detail.php?id=" . $event_id);
+            exit();
         }
-        
-        header("Location: event_detail.php?id=" . $event_id);
-        exit();
     }
 }
 
@@ -180,7 +201,7 @@ if (isset($_SESSION['toast_msg'])) {
               </a>
             </li>
             <li>
-              <a href="event.php" class="menu-link">
+              <a href="event.php" class="menu-link active">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 Cari Event
               </a>
@@ -198,6 +219,17 @@ if (isset($_SESSION['toast_msg'])) {
               </a>
             </li>
           </ul>
+
+
+          <span class="menu-title" style="margin-top:1rem;">Manajemen Pembayaran</span>
+        <ul class="menu-items">
+          <li>
+            <a href="pembayaran_peserta.php" class="menu-link ">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>          
+              Pembayaran Event
+            </a>
+          </li>
+        </ul>
           <span class="menu-title" style="margin-top:1rem;">Pengaturan</span>
           <ul class="menu-items">
             <li>
@@ -395,8 +427,33 @@ if (isset($_SESSION['toast_msg'])) {
               <span class="detail-price-val">Rp <?php echo number_format($event['harga'], 0, ',', '.'); ?></span>
             </div>
 
+
+            <?php
+            $reg_status = null;
+
+            $stmt = mysqli_prepare(
+                $koneksi,
+                "SELECT status FROM registration WHERE peserta_id = ? AND event_id = ?"
+            );
+
+            mysqli_stmt_bind_param($stmt, "ii", $user_id, $event_id);
+            mysqli_stmt_execute($stmt);
+            $res = mysqli_stmt_get_result($stmt);
+
+            if ($row = mysqli_fetch_assoc($res)) {
+                $reg_status = $row['status'];
+            }
+
+            mysqli_stmt_close($stmt);
+
+            ?>
+
+            
+
             <?php if ($event['status'] !== 'approve'): ?>
               <div class="badge-status-closed">Event Belum Dibuka</div>
+            <?php elseif ($reg_status === 'pending_payment'): ?>
+              <a href="upload_bukti.php" class="badge-status-closed">Upload Bukti Pembayaran !</a>
             <?php elseif ($is_registered): ?>
               <div class="badge-status-reg">Anda Sudah Terdaftar</div>
             <?php elseif ($event['quota'] <= 0): ?>
@@ -437,9 +494,7 @@ if (isset($_SESSION['toast_msg'])) {
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function showFeatureAlert(featureName) {
-      showToast(`Fitur "${featureName}" adalah mockup untuk purwarupa ini.`, 'info');
-    }
+
   </script>
 </body>
 </html>
