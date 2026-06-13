@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin' && $_SE
 
 $role     = $_SESSION['user_role'];
 $username = $_SESSION['username'];
+$user_id  = $_SESSION['user_id'] ?? 0;
 
 $event_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if (!$event_id) {
@@ -18,9 +19,9 @@ if (!$event_id) {
 
 $status_filter = $_GET['status'] ?? '';
 
-// Ambil info event + kategori
+// Ambil info event + kategori (sekaligus panitia_id untuk validasi akses)
 $q_event = mysqli_query($koneksi, "
-    SELECT e.name, e.status, e.quota, c.nama AS kategori
+    SELECT e.name, e.status, e.quota, e.panitia_id, c.nama AS kategori
     FROM events e
     LEFT JOIN categories c ON e.category_id = c.id
     WHERE e.id = $event_id
@@ -31,11 +32,84 @@ if (!$event) {
     exit();
 }
 
+// Validasi akses panitia: hanya boleh kelola event miliknya sendiri
+$authorized = ($role === 'admin') || ($role === 'panitia' && $event['panitia_id'] == $user_id);
+
+// Handle Action (Acc / Tolak Pembayaran)
+if (isset($_GET['action']) && isset($_GET['reg_id']) && $authorized) {
+    $action = $_GET['action'];
+    $reg_id = (int)$_GET['reg_id'];
+
+    if ($action === 'acc_payment' || $action === 'tolak_payment') {
+        // Ambil payment terkait registration ini
+        $p_stmt = mysqli_prepare($koneksi, "SELECT id FROM payment WHERE registration_id = ? ORDER BY id DESC LIMIT 1");
+        mysqli_stmt_bind_param($p_stmt, "i", $reg_id);
+        mysqli_stmt_execute($p_stmt);
+        $p_res = mysqli_stmt_get_result($p_stmt);
+        $payment_row = mysqli_fetch_assoc($p_res);
+        mysqli_stmt_close($p_stmt);
+
+        if ($payment_row) {
+            $payment_id = $payment_row['id'];
+
+            if ($action === 'acc_payment') {
+                // Update payment jadi lunas
+                $up1 = mysqli_prepare($koneksi, "UPDATE payment SET status_pembayaran = 'lunas' WHERE id = ?");
+                mysqli_stmt_bind_param($up1, "i", $payment_id);
+                mysqli_stmt_execute($up1);
+                mysqli_stmt_close($up1);
+
+                // Update registration jadi terdaftar
+                $up2 = mysqli_prepare($koneksi, "UPDATE registration SET status = 'terdaftar' WHERE id = ?");
+                mysqli_stmt_bind_param($up2, "i", $reg_id);
+                mysqli_stmt_execute($up2);
+                mysqli_stmt_close($up2);
+
+                $_SESSION['toast_msg'] = "Pembayaran berhasil disetujui.";
+                $_SESSION['toast_type'] = 'success';
+
+            } elseif ($action === 'tolak_payment') {
+                // Update payment jadi ditolak (status registration tetap pending_payment)
+                $up1 = mysqli_prepare($koneksi, "UPDATE payment SET status_pembayaran = 'ditolak' WHERE id = ?");
+                mysqli_stmt_bind_param($up1, "i", $payment_id);
+                mysqli_stmt_execute($up1);
+                mysqli_stmt_close($up1);
+
+                $_SESSION['toast_msg'] = "Pembayaran ditolak.";
+                $_SESSION['toast_type'] = 'info';
+            }
+        } else {
+            $_SESSION['toast_msg'] = "Data pembayaran tidak ditemukan.";
+            $_SESSION['toast_type'] = 'info';
+        }
+    }
+
+    // Redirect kembali ke halaman ini dengan filter status yang sama
+    $redirect_url = "detail_peserta.php?id=" . $event_id;
+    if ($status_filter != '') {
+        $redirect_url .= "&status=" . urlencode($status_filter);
+    }
+    header("Location: " . $redirect_url);
+    exit();
+}
+
+// Fetch Toast Notification
+$toast_msg = "";
+$toast_type = "";
+if (isset($_SESSION['toast_msg'])) {
+    $toast_msg = $_SESSION['toast_msg'];
+    $toast_type = isset($_SESSION['toast_type']) ? $_SESSION['toast_type'] : 'info';
+    unset($_SESSION['toast_msg']);
+    unset($_SESSION['toast_type']);
+}
+
 $query_peserta = "
-    SELECT u.nama_lengkap, u.nim, u.prodi, u.no_hp, u.angkatan,
-           r.waktu_daftar, r.waktu_hadir, r.status, r.kode_unik
+    SELECT r.id AS reg_id, u.nama_lengkap, u.nim, u.prodi, u.no_hp, u.angkatan,
+           r.waktu_daftar, r.waktu_hadir, r.status, r.kode_unik,
+           p.id AS payment_id, p.status_pembayaran, p.nominal, p.bukti_pembayaran
     FROM registration r
     JOIN users u ON r.peserta_id = u.id
+    LEFT JOIN payment p ON p.registration_id = r.id
     WHERE r.event_id = $event_id
 ";
 
@@ -64,6 +138,25 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detail Peserta - UniVent</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .bukti-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .bukti-link:hover {
+      text-decoration: underline;
+    }
+    .no-bukti {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+  </style>
 </head>
 <body>
 
@@ -239,6 +332,11 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
                       <?= ($status_filter == 'terdaftar') ? 'selected' : '' ?>>
                       Terdaftar
                   </option>
+
+                  <option value="pending_payment"
+                      <?= ($status_filter == 'pending_payment') ? 'selected' : '' ?>>
+                      Pending Payment
+                  </option>
               </select>
 
               <?php if($status_filter != ''): ?>
@@ -265,6 +363,8 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
                 <th>Waktu Daftar</th>
                 <th>Waktu Hadir</th>
                 <th>Status</th>
+                <th>Pembayaran</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -294,11 +394,42 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
                     <?php echo ucfirst($row['status'] ?? '-'); ?>
                   </span>
                 </td>
+                <td>
+                  <?php if ($row['payment_id']): ?>
+                    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                      <span class="status-badge <?php echo strtolower($row['status_pembayaran'] ?? ''); ?>">
+                        <?php echo ucfirst($row['status_pembayaran'] ?? '-'); ?>
+                      </span>
+                      <span style="font-size:0.8rem; color: var(--text-muted);">
+                        Rp <?php echo number_format($row['nominal'], 0, ',', '.'); ?>
+                      </span>
+                      <?php if (!empty($row['bukti_pembayaran'])): ?>
+                        <a href="uploads/bukti_bayar/<?php echo rawurlencode($row['bukti_pembayaran']); ?>" target="_blank" class="bukti-link">Lihat Bukti &rarr;</a>
+                      <?php else: ?>
+                        <span class="no-bukti">Tidak ada bukti</span>
+                      <?php endif; ?>
+                    </div>
+                  <?php else: ?>
+                    <span class="no-bukti">-</span>
+                  <?php endif; ?>
+                </td>
+                <td class="actions-cell">
+                  <?php if ($authorized && $row['payment_id'] && $row['status_pembayaran'] === 'pending'): ?>
+                    <a href="detail_peserta.php?id=<?php echo $event_id; ?>&action=tolak_payment&reg_id=<?php echo $row['reg_id']; ?><?php echo $status_filter != '' ? '&status='.urlencode($status_filter) : ''; ?>"
+                       class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;"
+                       onclick="return confirm('Tolak pembayaran peserta ini?')">Tolak</a>
+                    <a href="detail_peserta.php?id=<?php echo $event_id; ?>&action=acc_payment&reg_id=<?php echo $row['reg_id']; ?><?php echo $status_filter != '' ? '&status='.urlencode($status_filter) : ''; ?>"
+                       class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;"
+                       onclick="return confirm('Setujui pembayaran peserta ini?')">Acc</a>
+                  <?php else: ?>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">-</span>
+                  <?php endif; ?>
+                </td>
               </tr>
               <?php endwhile;
               else: ?>
               <tr>
-                <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                <td colspan="12" style="text-align: center; color: var(--text-muted); padding: 2rem;">
                   Belum ada peserta yang mendaftar di event ini.
                 </td>
               </tr>
@@ -310,6 +441,19 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
       </section>
     </main>
   </div>
+
+  <div id="toast" class="toast <?php echo !empty($toast_msg) ? 'show' : ''; ?> <?php echo ($toast_type === 'success') ? 'toast-success' : ''; ?>">
+    <span id="toast-message"><?php echo htmlspecialchars($toast_msg); ?></span>
+  </div>
+
+  <script>
+    const toast = document.getElementById('toast');
+    if (toast.classList.contains('show')) {
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
 
 </body>
 </html>
