@@ -139,6 +139,11 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
   <title>Detail Peserta - UniVent</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    main {
+      min-width: 0;
+      overflow: hidden;
+    }
+
     .bukti-link {
       display: inline-flex;
       align-items: center;
@@ -155,6 +160,39 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
       color: var(--text-muted);
       font-size: 0.8rem;
       font-style: italic;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    table {
+      white-space: nowrap;
+      border-collapse: collapse;
+      width: auto; /* Jangan pakai min-width: max-content */
+    }
+
+    /* Kolom Nama Lengkap boleh wrap */
+    th:nth-child(2),
+    td:nth-child(2) {
+      white-space: normal;
+      min-width: 130px;
+      max-width: 160px;
+    }
+
+    .status-badge.lunas {
+      color: #00d400;
+    }
+
+    .status-badge.ditolak {
+        color: #811412;
+    }
+
+    .status-badge.pending {
+        color: #f59e0b;
     }
   </style>
 </head>
@@ -415,12 +453,42 @@ $total_hadir = mysqli_fetch_assoc($q_hadir)['jumlah'];
                 </td>
                 <td class="actions-cell">
                   <?php if ($authorized && $row['payment_id'] && $row['status_pembayaran'] === 'pending'): ?>
-                    <a href="detail_peserta.php?id=<?php echo $event_id; ?>&action=tolak_payment&reg_id=<?php echo $row['reg_id']; ?><?php echo $status_filter != '' ? '&status='.urlencode($status_filter) : ''; ?>"
-                       class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;"
-                       onclick="return confirm('Tolak pembayaran peserta ini?')">Tolak</a>
-                    <a href="detail_peserta.php?id=<?php echo $event_id; ?>&action=acc_payment&reg_id=<?php echo $row['reg_id']; ?><?php echo $status_filter != '' ? '&status='.urlencode($status_filter) : ''; ?>"
-                       class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;"
-                       onclick="return confirm('Setujui pembayaran peserta ini?')">Acc</a>
+
+                    <?php
+                    $tolak_url = 'detail_peserta.php?' . http_build_query([
+                        'id' => $event_id,
+                        'action' => 'tolak_payment',
+                        'reg_id' => $row['reg_id'],
+                        'status' => $status_filter
+                    ]);
+                    ?>
+
+                    <a href="<?= htmlspecialchars($tolak_url) ?>"
+                      class="btn-sm btn-reject"
+                      style="display:inline-flex; align-items:center; text-decoration:none;"
+                      onclick="return confirm('Tolak pembayaran peserta ini?')">
+                      Tolak
+                    </a>
+
+
+                    <?php
+                      $acc_url = 'detail_peserta.php?' . http_build_query([
+                        'id'      => $event_id,
+                        'action'  => 'acc_payment',
+                        'reg_id'  => $row['reg_id'],
+                        'status'  => $status_filter
+                      ]);
+
+                    ?>
+
+                    <a href="<?= htmlspecialchars($acc_url) ?>"
+                      class="btn-sm btn-approve"
+                      style="display:inline-flex; align-items:center; text-decoration:none;"
+                      onclick="return confirm('Setujui pembayaran peserta ini?')">
+                      Acc
+                    </a>
+                      
+                    
                   <?php else: ?>
                     <span style="color: var(--text-muted); font-size: 0.8rem;">-</span>
                   <?php endif; ?>
