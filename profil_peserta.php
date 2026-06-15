@@ -292,7 +292,7 @@ mysqli_stmt_close($profil_stmt);
     </div>
     <div class="header-right">
       <div class="user-profile-meta">
-        <span class="user-info-text">Login Sebagai</span>
+        
         <span class="user-info-role"><?php echo htmlspecialchars(ucfirst($role)); ?></span>
       </div>
       <a href="logout.php" class="logout-btn-header">Keluar</a>
@@ -330,7 +330,6 @@ mysqli_stmt_close($profil_stmt);
             </a>
           </li>
         </ul>
-
         <span class="menu-title" style="margin-top:1rem;">Manajemen Pembayaran</span>
         <ul class="menu-items">
           <li>
@@ -340,11 +339,10 @@ mysqli_stmt_close($profil_stmt);
             </a>
           </li>
         </ul>
-
         <span class="menu-title" style="margin-top:1rem;">Pengaturan</span>
         <ul class="menu-items">
           <li>
-            <a href="profil.php" class="menu-link active">
+            <a href="profil_peserta.php" class="menu-link active">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
               Profil
             </a>
@@ -409,7 +407,6 @@ mysqli_stmt_close($profil_stmt);
         <!-- Form Edit Kanan -->
         <div class="profil-form-card">
           <form method="POST" action="profil_peserta.php">
-
 
             <div class="form-section-title">Informasi Pribadi</div>
             <div class="form-grid">

@@ -32,8 +32,8 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
     </div>
     <div class="header-right">
       <div class="user-profile-meta">
-<span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>        
-<span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
+      <span class="user-info-text"><?php echo htmlspecialchars($username ?? ''); ?></span>        
+      <span class="user-info-role"><?php echo htmlspecialchars($role); ?></span>
       </div>
       <a href="logout.php" class="logout-btn-header">Keluar</a>
     </div>
@@ -183,10 +183,12 @@ unset($_SESSION['toast_msg'], $_SESSION['toast_type']);
                 <td><span class="status-badge <?php echo strtolower($row['status']); ?>"><?php echo $row['status']; ?></span></td>
                 <td>
                     <!-- <a href="proses_hapus_event.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin hapus?');" class="btn-sm btn-reject">Hapus</a> -->
+                  <?php if($row['status'] === 'p  ending'): {?>
                     <a href="proses_persetujuan_event.php?action=reject&id=<?php echo $row['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>
-                    <a href="proses_persetujuan_event.php?action=approve&id=<?php echo $row['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>
-                    <a href="event_detail.php?id=<?php echo $row['id']; ?>" class="btn-detail" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 1rem;">Detail-></a>
-                    
+                    <a href="proses_persetujuan_event.php?action=approve&id=<?php echo $row['id']; ?>" class="btn-sm btn-approve" style="display:inline-flex; align-items:center; text-decoration:none;">Setujui</a>                  
+                 <?php }endif; ?>
+                                     <a href="event_detail.php?id=<?php echo $row['id']; ?>" class="btn-detail" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 1rem;">Detail-></a>
+
                 </td>
               </tr>
               <?php 

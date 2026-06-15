@@ -2,7 +2,7 @@
 session_start();
 include 'koneksi.php';
 
-// Redirect to login if session doesn't exist
+// dibalikin kalau belum login atau kalau sesi user nya gaada 
 if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'panitia')) {
     header("Location: login.php");
     exit();
@@ -12,7 +12,7 @@ $role = $_SESSION['user_role'] ?? '';
 $username = $_SESSION['username'] ?? '';
 $user_id = $_SESSION['user_id'] ?? 0;
 
-// Handle Admin Action (Approve / Reject)
+// Handle aksi Admin (setujui / tolak)
 if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
     $action = $_GET['action'];
     $id = (int)$_GET['id'];
@@ -20,7 +20,6 @@ if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
     $status = ($action === 'approve') ? 'approve' : (($action === 'reject') ? 'reject' : null);    
     
     if ($status) {
-        // Fetch event name first for toast message
         $name_stmt = mysqli_prepare($koneksi, "SELECT name FROM events WHERE id = ?");
         mysqli_stmt_bind_param($name_stmt, "i", $id);
         mysqli_stmt_execute($name_stmt);
@@ -31,7 +30,7 @@ if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
         }
         mysqli_stmt_close($name_stmt);
 
-        // Update status in DB
+        // Update status di database
         $stmt = mysqli_prepare($koneksi, "UPDATE events SET status = ? WHERE id = ?");
         mysqli_stmt_bind_param($stmt, "si", $status, $id);
         if (mysqli_stmt_execute($stmt)) {
@@ -44,7 +43,7 @@ if ($role === 'admin' && isset($_GET['action']) && isset($_GET['id'])) {
     exit();
 }
 
-// Fetch Toast Notification
+//  Notifikais
 $toast_msg = "";
 $toast_type = "";
 if (isset($_SESSION['toast_msg'])) {
@@ -329,10 +328,11 @@ if (isset($_SESSION['toast_msg'])) {
               <tbody>
                 <?php 
                 // 1. QUERY Gabungkan events dan users untuk mencari prodi, khusus status pending
-                $query_pending = "SELECT events.*, users.prodi 
-                                  FROM events 
-                                  LEFT JOIN users ON events.panitia_id = users.id 
-                                  WHERE events.status = 'pending'";
+                $query_pending = "SELECT events.*, users.prodi, categories.nama AS category_name
+                   FROM events 
+                   LEFT JOIN users ON events.panitia_id = users.id 
+                   LEFT JOIN categories ON events.category_id = categories.id
+                   WHERE events.status = 'pending'";
 
                 $pending_events_res = mysqli_query($koneksi, $query_pending);
                 $has_pending = false;
@@ -349,9 +349,7 @@ if (isset($_SESSION['toast_msg'])) {
                 ?>
                   <tr>
                     <td class="event-name-cell"><?php echo htmlspecialchars($event['name']); ?></td>
-                    <td><?php echo htmlspecialchars($event['category']); ?></td>
-                    <td><?php echo htmlspecialchars($event['quota']); ?></td>
-                    <td><?php echo htmlspecialchars($event['created_at']); ?></td>
+<td><?php echo htmlspecialchars($event['category_name'] ?? '-'); ?></td>                    <td><?php echo htmlspecialchars($event['created_at']); ?></td>
                     <td><span class="status-badge pending">Pending</span></td>
                     <td class="actions-cell">
                       <a href="dashboard.php?action=reject&id=<?php echo $event['id']; ?>" class="btn-sm btn-reject" style="display:inline-flex; align-items:center; text-decoration:none;">Tolak</a>

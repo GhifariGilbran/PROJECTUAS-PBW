@@ -16,14 +16,14 @@ if ($role !== 'peserta') {
     exit();
 }
 
-// ── DATA PROFIL PESERTA ───────────────────────────────────────────────────────
+// DATA PROFIL PESERTA
 $profil_stmt = mysqli_prepare($koneksi, "SELECT * FROM users WHERE id = ?");
 mysqli_stmt_bind_param($profil_stmt, "i", $user_id);
 mysqli_stmt_execute($profil_stmt);
 $profil = mysqli_fetch_assoc(mysqli_stmt_get_result($profil_stmt));
 mysqli_stmt_close($profil_stmt);
 
-// ── STATISTIK ─────────────────────────────────────────────────────────────────
+// STATISTIK 
 $total_event_res = mysqli_query($koneksi, "SELECT COUNT(*) as count FROM events WHERE status = 'approve'");
 $total_event     = mysqli_fetch_assoc($total_event_res)['count'] ?? 0;
 
@@ -49,7 +49,7 @@ mysqli_stmt_execute($sertif_stmt);
 $sertif_count = mysqli_fetch_assoc(mysqli_stmt_get_result($sertif_stmt))['count'] ?? 0;
 mysqli_stmt_close($sertif_stmt);
 
-// ── EVENT MENDATANG ───────────────────────────────────────────────────────────
+// ── EVENT MENDATANG 
 $upcoming_stmt = mysqli_prepare($koneksi, "
     SELECT e.id, e.name, e.tgl_mulai, e.lokasi
     FROM events e
@@ -60,7 +60,7 @@ $upcoming_stmt = mysqli_prepare($koneksi, "
 mysqli_stmt_execute($upcoming_stmt);
 $upcoming_res = mysqli_stmt_get_result($upcoming_stmt);
 
-// ── DAFTAR EVENT PESERTA ──────────────────────────────────────────────────────
+// ── DAFTAR EVENT PESERTA 
 $my_events_stmt = mysqli_prepare($koneksi, "
     SELECT
         e.id, e.name, e.tgl_mulai, e.tgl_selesai, e.lokasi,
@@ -92,7 +92,6 @@ $my_events_res = mysqli_stmt_get_result($my_events_stmt);
     </div>
     <div class="header-right">
       <div class="user-profile-meta">
-        <span class="user-info-text">Login Sebagai</span>
         <span class="user-info-role"><?php echo htmlspecialchars(ucfirst($role)); ?></span>
       </div>
       <a href="logout.php" class="logout-btn-header">Keluar</a>
